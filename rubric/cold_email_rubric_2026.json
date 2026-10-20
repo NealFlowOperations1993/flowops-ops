@@ -1,0 +1,235 @@
+{
+  "title": "FlowOps Cold Email Rubric 2026",
+  "generated": "2026-08-25",
+  "input_basis": "224 extracted claims from top practitioners (YouTube transcripts, IG creators, benchmark blogs: Instantly, Woodpecker, Belkins, MailReach, Smartlead, Gong, Lemlist, Lavender, Hunter, QuickMail)",
+  "engine_snapshot": "500/day, 10 inboxes (50/inbox), 2 domains, ~3wk warmup. Open 53-61%, raw reply 2.4% (day 2, 0 human positives), click 0%, bounce ~1.7-2.3%.",
+  "stages": [
+    {
+      "stage": "sourcing",
+      "what_top_performers_do": [
+        "List is king — ranked above message, lead magnet, and offer; define the avatar first, build small hyper-relevant lists around a single angle (3,701 Compass agents in CA beats 30K generic) [Hormozi Cold Email 2026; Instantly Beginners Tutorial]",
+        "Layer 3+ filters (industry + size + vertical + role) into narrow segments with a separate campaign per segment; sends under 50 contacts avg 5.8% replies vs 2.1% at 1,000+ [Best Cold Email Strategy in 2026; Woodpecker stats]",
+        "Trigger/signal-based targeting beats static filters: recently funded (<12mo, $2M+), hiring posts, first-time CEOs, website-visitor de-anonymization (30%+ positive reply share) [Nowoslawski/Growth Engine X; BEST Strategy 2026/Crunchbase; RB2B/7-min video]",
+        "Lookalike lists from 5-10 best customers (ocean.io) outperform the Apollo title/industry filters everyone uses [4.5M emails/90 days]",
+        "Size TAM to the model: 50K-100K+ ideal for volume plays, 20K+ workable; recycle the full TAM every ~2-3 months (aggressive edge 5 weeks) with new angles [Aaron/Client Ascension; Best Cold Email Strategy For 2026; Nowoslawski]",
+        "Smaller companies/founders reply most: 0-10 employees 0.72% vs 10K+ 0.22%; founders 0.57% vs VPs 0.32% [Belkins]"
+      ],
+      "benchmark_bands": {
+        "score_9_10": "Signal/trigger-driven lists (funding, hiring, visitor ID) + lookalike sourcing + narrow segments with per-segment copy + TAM sized and mapped with a scheduled 2-3 month recycle cadence [Nowoslawski; Belkins; Best Strategy 2026]",
+        "score_7_8": "Avatar-first niche lists with 3+ stacked filters and at least one live buying-signal source; segments matched to copy angles; TAM known but recycle cadence informal [Hormozi; Best Cold Email Strategy in 2026]",
+        "score_5_6": "Relevant category-level lists (right industry/geo) but broad segments, no trigger signals, no TAM math or recycle plan [Woodpecker: 200-500 contact sends ~3%]",
+        "score_below": "Generic bulk scrapes, one campaign for a 50K-lead pull, list built before offer/avatar defined [Best Cold Email Strategy in 2026 anti-pattern]"
+      },
+      "our_current_score": 7,
+      "score_rationale": "Google Maps category scrape for trades + Consulti white-collar are avatar-first niche lists, and the free signal engine (hiring posts/Skool/EDGAR) puts us in the trigger-based tier that Nowoslawski calls the best-performing lever — all at zero enrichment cost. What keeps us out of the 8-9 band: no documented TAM sizing per niche, no scheduled 2-3 month recycle cadence, and no lookalike expansion from eventual won deals.",
+      "top_optimization": "Wire the signal engine INTO campaign assignment: route hiring-post/EDGAR-triggered leads to a dedicated trigger-referencing variant (majority position: signal-opened emails are the single best reply lever), and write down TAM per niche with a 90-day full-cycle recycle calendar."
+    },
+    {
+      "stage": "contacts",
+      "what_top_performers_do": [
+        "Waterfall enrichment across multiple providers (Prospeo → fallback) hits ~100% coverage vs ~50% single-provider; always target the named decision-maker, not the company shell [Matt Lucero FULL COURSE; BEST Strategy 2026]",
+        "Filter by employee headcount not revenue (revenue is guessed for private cos); expect 5-10% invalid even on 'verified' provider data — re-verify everything [Matt Lucero FULL COURSE]",
+        "Avoid role/generic accounts (info@, sales@, admin@) — they bounce, get complaints, and are pruned by top deliverability systems [Ultimate Guide to Deliverability 2026; MailReach 17 Actions]",
+        "~70% verified-email coverage of TAM is 'really good'; coverage gets exponentially harder at the margin [Best Cold Email Strategy For 2026]",
+        "Cheap-first sourcing is viable at scale: Ample Leads ~$1.20/1,000, Scraper City $149/mo unlimited — spend money on verification, not list acquisition [50K-in-a-week; Unlimited B2B Leads $149]"
+      ],
+      "benchmark_bands": {
+        "score_9_10": "Named decision-maker emails via multi-provider waterfall, ~100% coverage on target accounts, role accounts stripped, 5-10% provider error assumed and re-verified [Matt Lucero; Ultimate Guide 2026]",
+        "score_7_8": "70%+ verified coverage of TAM, mostly personal (first.last) addresses, single good provider plus fallback for misses [Best Strategy For 2026 70% benchmark]",
+        "score_5_6": "50-65% coverage (single-source hit rate territory), meaningful share of role/generic addresses, no decision-maker guarantee [Matt Lucero ~50% single-provider baseline]",
+        "score_below": "Bulk purchased lists unverified (job churn kills ~10%), heavy info@ usage, no idea who actually receives the email [Mailscale; Ultimate Guide anti-patterns]"
+      },
+      "our_current_score": 5,
+      "score_rationale": "Free site-scrape at 64% hit sits squarely in the 5-6 band — just under the 70% 'really good' coverage benchmark — and site-scraped SMB emails skew toward exactly the role/generic addresses (info@) the Ultimate Guide and MailReach say to remove. We also have no owner-name resolution for trades, so a chunk of sends are company-addressed rather than decision-maker-addressed. The cost discipline is right; the coverage and identity precision are the gap.",
+      "top_optimization": "Add one free/cheap fallback layer for the 36% miss + role-account share: owner-name extraction from GMB/state contractor license registries, then pattern-guess + verify — lifts coverage toward 70%+ and converts info@ sends into named-owner sends without a paid enrichment subscription."
+    },
+    {
+      "stage": "verification",
+      "what_top_performers_do": [
+        "Verify every list, every time — verified lists get ~2x the reply rate of unverified [Woodpecker; MailReach 17 Actions]",
+        "Double-verify with a waterfall (MillionVerifier primary, Bounceban fallback in Clay) and send only to 'ok'/'deliverable' [Only Deliverability Video 2026]",
+        "Keep bounce under 2% hard ceiling — some sources push <4% but the deliverability-focused majority says <2% [Instantly benchmark report; MailReach; Woodpecker]",
+        "Handle catch-alls deliberately: ~23% of catch-alls bounce, so cap them at ~20% of any campaign [MailReach 17 Actions]",
+        "Verification is cheap relative to domain damage: $0.0036/email cited [Unlimited B2B Leads $149]"
+      ],
+      "benchmark_bands": {
+        "score_9_10": "Waterfall verification (2 providers), only 'deliverable' sent, catch-alls capped ~20%, sustained bounce <1%, weekly bounce/duplicate cleanup [Only Deliverability Video; MailReach; Ultimate Guide 2026]",
+        "score_7_8": "Single-provider verification on 100% of sends, bounce consistently under 2%, catch-alls tracked [Woodpecker 2x claim; Instantly <2%]",
+        "score_5_6": "Proxy verification only (scrape recency, pattern checks), bounce hovering at/around the 2% line — working but no margin [MailReach <2% threshold]",
+        "score_below": "No verification, bounce >2-4%, catch-alls sent blind [Smartlead <4% outer bound; MailReach red flags]"
+      },
+      "our_current_score": 5,
+      "score_rationale": "Same-day site re-verify + niche-relevance gate + tool-URL-200 gate are real freshness checks, but they verify the COMPANY exists, not that the MAILBOX accepts mail — which is what the 2x-reply verification claim is about. Live bounce of ~1.7-2.3% straddles the <2% hard ceiling from Instantly/MailReach/Woodpecker with zero margin, on only 2 domains that can't absorb a bad batch. This is the 5-6 band by definition: proxy verification, bounce at the line.",
+      "top_optimization": "Add SMTP-level verification on just the outbound queue (MillionVerifier at ~$0.0036/email = ~$1.80/day for 500 sends — cheapest possible insurance) and hard-drop anything not 'deliverable'; target bounce <1.5% within a week."
+    },
+    {
+      "stage": "personalization",
+      "what_top_performers_do": [
+        "Personalization roughly doubles replies: 17-18% vs 7-9% [Woodpecker]; multi-point personalization +142% [Smartlead]; only ~5% of senders personalize per-email yet see 2-3x [Hunter]",
+        "Relevance beats trivia-personalization: 'I noticed you have an open job role' beats personal facts, which now read as AI slop; over-personalization reads robotic in 2026 [Alex Heiden; 1.5M/month sender]",
+        "'Show your work' — attribute observations to a checkable source so wrong data blames the source, not you; use AI only for the one dynamic line, never the whole email [Nowoslawski]",
+        "Observable, specific, verifiable openers capped ~15 words; if you can't do real personalization, skip the opener rather than fake it [40.2% Reply Rate video]",
+        "Open with the trigger (hiring, funding, growth), not who you are — interview closers on the last 3 deals to find the triggers [Trigger template video]"
+      ],
+      "benchmark_bands": {
+        "score_9_10": "Per-lead observable findings + live trigger/signal reference, branched messaging by which signals fire, sourced/attributable claims, zero fabrication [Nowoslawski waterfall triggers; Woodpecker 2x; Smartlead +142%]",
+        "score_7_8": "Real observable per-lead personalization (site/profile-derived, specific, verifiable) but single-mechanism — no signal branching [40.2% video; lemlist 4-8% vs 1-2%]",
+        "score_5_6": "Template + merge fields with an inferred industry/title reference; relevant but not specific to the individual company [lemlist generic-template 1-2% tier, upper end]",
+        "score_below": "Fake personalization ('saw you're a {job title}', 'came across your profile'), AI-slop first lines, or fabricated claims [alassafi.ai banned-phrase list; 40.2% video anti-pattern]"
+      },
+      "our_current_score": 7,
+      "score_rationale": "The deterministic 7-finding site-scan (footer year, mobile, http, images, tel, booking, financing) is exactly the observable-specific-verifiable personalization the 40.2% framework prescribes, with zero LLM fabrication risk — and 'your site still says 2023 in the footer' is inherently show-your-work. It's solidly the 7-8 band; it misses 9-10 because findings don't branch messaging (every lead gets the same frame regardless of which findings fire) and the signal engine's triggers (hiring/EDGAR) aren't yet referenced in copy.",
+      "top_optimization": "Branch the opener on the highest-severity finding (http/no-mobile = risk frame; no-booking/no-financing = revenue-leak frame) instead of a uniform 7-finding dump — Nowoslawski's branch-on-signal pattern, still fully deterministic."
+    },
+    {
+      "stage": "offer",
+      "what_top_performers_do": [
+        "An insane free lead magnet, operationalized, is 'bar none' the biggest response-rate boost — offer something others charge for, delivered like clockwork [Hormozi Cold Email 2026]",
+        "Front-end offer = free sample of the service people most buy first (free ad creative, mockup, shortlist); a mechanism they've never seen (free 70-lead list, free deliverable) — ascension beats direct pitching [Alex Heiden; 4.5M/90-days]",
+        "Reverse lead magnet with pre-filled personalized result page: 5%+ replies 'guaranteed', 5x lift vs PDF magnets, 8% case [LeadGen Jay]",
+        "Offer strength dominates copy: identical strategy produces 9% replies for one client and near-zero for another purely on offer [7-min video]; value equation: dream outcome x likelihood / (time x effort) [Hormozi]",
+        "CTA must be a free tangible deliverable usable WITHOUT hiring you — never a 20-30 min call ask in email 1 [40.2% video]",
+        "Quantifiable beats clever; first campaign = bare offer + 'just reply yes' [7-min video]"
+      ],
+      "benchmark_bands": {
+        "score_9_10": "Never-seen-before free mechanism, personalized per lead, delivered instantly with zero friction (pre-filled, no opt-in), validated against VOC, with proven ascension to the paid offer [LeadGen Jay; 4.5M/90-days; Hormozi]",
+        "score_7_8": "Tangible operationalized free deliverable others charge for, usable without hiring you, in email 1 — but delivery/ascension not yet evidenced by engagement data [Hormozi; 40.2% video]",
+        "score_5_6": "Free offer exists but is generic (audit/Loom/consult) or gated behind a call; Loom-audit CTAs convert only 5-10% of yeses [Matt Lucero CTA rankings]",
+        "score_below": "Direct meeting ask, no free value, 'do you have time for a quick call, here's my link' [Hormozi anti-pattern]"
+      },
+      "our_current_score": 8,
+      "score_rationale": "Pre-built branded microsaas (patio estimator/booking page) delivered IN email 1 is the strongest offer archetype in the corpus — LeadGen Jay's reverse-lead-magnet pattern plus Hormozi's operationalized-free-value rule, VOC-validated against 7,142 datapoints. It stops short of 9-10 only because click rate is 0% at day 2: the offer's delivery/engagement loop is unproven, and there's no evidence yet the personalized-tool page converts attention into replies.",
+      "top_optimization": "Diagnose the 0% click before anything else — with 53-61% opens and a tool link in every email, zero clicks means either the sleadtrack wrap is suppressing/mistrusting clicks or the link presentation isn't earning them; test a no-tracking plain-URL variant on one inbox to isolate it."
+    },
+    {
+      "stage": "copy",
+      "what_top_performers_do": [
+        "Under 80-125 words, one CTA, plain text: best campaigns <80 words [Instantly benchmark]; 50-100 words low reading level [Best Strategy in 2026]; <200 words outer bound [Hormozi]; 120-word emails booked 52% vs 20% for 300 words [lemlist]",
+        "Sub-3rd-grade reading level alone produced a 50% response bump [Hormozi Cold Email 2026]; exact numbers beat ranges ('17.3 members' not '20-30') [Hormozi]",
+        "Structure: relevance/observation line → problem → solution/mechanism → proof with specific numbers → soft hand-raise CTA ('Interested?' / 'want me to send more info?') [OPSA; Instantly tutorial; Best Strategy in 2026; Gong: interest CTA books 15% at cold stage]",
+        "Subject lines: 1-4 lowercase words, curiosity not pitch ('FYI {name}', 'quick question', 'capital question'); internal/co-worker look [Aaron; Best Strategy in 2026; 50K-week]; minority (Sam McKenna) argues hyper-personal long subjects, but short-vague is the clear majority position",
+        "Sequences short: 3 emails max with 3-5 day gaps — emails 4-8 just get you marked spam [Nowoslawski]; 1-3 follow-ups over 7-14 days [Instantly]; majority lands at 2-4 total touches, breakup asks 'is someone else the right person', never begs [Nowoslawski; Connor Murray]",
+        "Test market hypotheses (offer, persona, case study) with 300-1,000+ sends per variant — CTA-wording split tests are worthless [Nowoslawski; What Improves Reply Rate; SaaS Strategy: winners 1,900 vs losers 25,000 emails/positive]"
+      ],
+      "benchmark_bands": {
+        "score_9_10": "<80 words, 3rd-grade level, exact-number proof line, interest-based CTA, 2-3 email sequence at 3-5 day gaps, disciplined variant testing at 300-1,000 sends/variant with hypothesis-level (not wording) tests [Instantly; Hormozi; Nowoslawski; Gong]",
+        "score_7_8": "Short plain-text emails, correct sequence shape (≤4 touches, 2-5 day gaps, breakup last), single CTA, structured A/B testing running but proof/case-study line weak or unproven [Instantly 4-7 touchpoint tolerance; Woodpecker]",
+        "score_5_6": "Reasonable length but missing proof element or testing below significance thresholds; sequence right but variants untested [What Improves Reply Rate: 300+ leads/variant floor]",
+        "score_below": "Long salesy bulleted HTML, 'quick call?' email-1 CTA, 5+ touch bump sequences, 'just bumping this' [AutoUp case: 2 vs hundreds of opps; Nowoslawski]"
+      },
+      "our_current_score": 7,
+      "score_rationale": "Sequence architecture is textbook: 3 emails day 0/3/7 with breakup last matches Nowoslawski's 3-max/3-5-day-gap rule exactly, plain text, one link, and 10 variants (5 question subjects x give/ask) is a real hypothesis-level test (give vs ask is an offer-frame test, not CTA wording). It's not 8+ yet because no variant has reached the 300-sends-per-variant significance floor (day 2, ~1,000 total sends across 10 variants), and we have no evidence the copy carries a specific-number proof line — plus one link in email 1 runs against the no-links-in-first-email majority.",
+      "top_optimization": "Cut from 10 variants to the best 4 so each hits the 300-send significance floor within a week (What Improves Reply Rate: test after 300+ leads/variant), and add one exact-number VOC proof line (Hormozi: '17.3 not 20-30') to the give variants."
+    },
+    {
+      "stage": "deliverability",
+      "what_top_performers_do": [
+        "SPF/DKIM/DMARC on every domain (Gmail/Yahoo enforcement makes it non-negotiable), secondary domains only, custom tracking domain mandatory [MailReach 17 Actions; AutoUp; QuickMail]",
+        "Disable open tracking — it hurts deliverability and the data is unreliable (Apple MPP); optimize positive reply rate instead [Instantly tutorial; What Improves Reply Rate; Only Deliverability Video]",
+        "Minimize links (one can kill deliverability), never send bulk from your main domain, plain text, spintax so no two emails are identical [MailReach; Ultimate Guide 2026: 95-97% inbox rate system]",
+        "20-30 emails/day/inbox is the consensus ceiling (Mailscale/Only Deliverability Video say 20; Nowoslawski/Hormozi/Instantly say 30; Matt Lucero 20-25 'never 100'); 3-5 inboxes/domain with the deliverability-focused sources revising down to 3 [Only Deliverability Video; Matt Lucero]",
+        "Redundancy: many cheap domains so spam issues don't cascade; 3 rotating infrastructure sets (odd/even/backup); diversify Google + Outlook because placement flips week to week [MailReach; SaaS Strategy; AutoUp; 7-min video]",
+        "Monitor with placement tests (not opens): mail-tester 9/10+, MailReach 80%+ placement or back to warmup 7-14 days; spam complaints <0.1%, bounce <2% [Mailscale diagnostic; MailReach; Instantly]"
+      ],
+      "benchmark_bands": {
+        "score_9_10": "Full auth incl. enforced DMARC, custom tracking domain or tracking off entirely, ≤30/inbox/day, 3+ inboxes/domain max, 10+ domains across 2 providers with a benched backup set, routine placement testing, 95-97% inbox rate [Ultimate Guide 2026; SaaS Strategy 3-set rotation; MailReach]",
+        "score_7_8": "Auth valid, open tracking OFF, per-inbox volume within 20-30 consensus, enough domain spread that one burned domain costs <20% of capacity, periodic placement tests [17 Actions; Only Deliverability Video]",
+        "score_5_6": "Auth valid and opens healthy, but one or two table-stakes violations (tracking on without custom domain, thin domain redundancy, per-inbox volume above consensus) — working today, fragile tomorrow [AutoUp: campaigns at 90% positive collapsed overnight on one infra weakness]",
+        "score_below": "Main-domain sending, no auth, HTML-heavy, 50-100+/inbox on young domains, no monitoring [MailReach; roee.tsur 4.5% spam-rate cautionary]"
+      },
+      "our_current_score": 4,
+      "score_rationale": "Opens at 53-61% and valid SPF/DKIM/DMARC show it's working right now, but the stage stacks four table-stakes violations: open AND click tracking on with no custom tracking domain (MailReach calls the custom domain mandatory; three sources say kill open tracking outright), 50/inbox/day is roughly double the 20-30 consensus ceiling on ~3-week-old inboxes, and 2 domains means one blacklist event vaporizes 50% of capacity — the exact cascade MailReach's multi-domain rule and the SaaS 3-set rotation exist to prevent. Per the rubric's own terms this cannot score above the fragile 5-6 band, and the shared sleadtrack click-wrap plus DMARC p=none pull it to 4.",
+      "top_optimization": "One config day: disable open tracking, set a custom tracking domain (or kill click tracking too), and add 2-3 more $3-15 domains to bring per-inbox volume down toward 25-30/day at the same 500/day total — every change is cheap and each removes a documented burn-down vector."
+    },
+    {
+      "stage": "sending_volume",
+      "what_top_performers_do": [
+        "Scale horizontally, never vertically: 20-30/inbox/day across many inboxes; 5,000/day = ~250 accounts at 20/inbox [Alex Heiden; Nowoslawski; Matt Lucero: 400-500 accounts for 10K/day]",
+        "Ramp new inboxes conservatively: start 1-2/day (AutoUp), or 15-20/day rising 10-15%/week (TrulyInbox video); burning a domain costs 3-4 weeks of rewarm [AutoUp]",
+        "Warm 2+ weeks minimum (majority; 4-6 weeks per Instantly benchmark report) and keep warmup running permanently alongside campaigns, ~1:1 warmup ratio per Lucero [Mailscale; Ultimate Guide 2026; Matt Lucero]",
+        "Randomized spacing 6-7+ minutes between sends, spread across the day, no blasts [Mailscale; Instantly Ultimate Guide; MailReach]",
+        "Volume floors: 6,000/mo minimum viable, 20,000/mo to be 'serious' [Unlimited B2B $149]; forecast math: avg offer = 1 meeting/500 contacts, ~3,500 emails/closed deal [Matt Lucero]",
+        "Best timing: Wed/Thu mornings 8AM-12PM (0.54% vs 0.40% late evening) [Belkins]; when a campaign works, 10x it, don't +20% it [Jake/Client Ascension]"
+      ],
+      "benchmark_bands": {
+        "score_9_10": "20-30/inbox/day with 2x spare warmed capacity, permanent 1:1 warmup, provider-split fleet, randomized spacing, volume sized to TAM-cycle math, instant 10x path when a variant wins [Matt Lucero; Heiden; Jake]",
+        "score_7_8": "Within per-inbox consensus (≤30/day), 2+ week warmup honored, proper spacing and stop-on-reply, ≥15-20K/mo aggregate — but no spare capacity or provider diversification [Mailscale; Unlimited B2B]",
+        "score_5_6": "Aggregate volume healthy but per-inbox load 1.5-2x consensus, or ramp too fast for inbox age, single provider — volume is borrowed against domain health [AutoUp conservative-ramp warnings]",
+        "score_below": "50-100+/inbox on young domains, no warmup, blast patterns, <6K/mo with no scaling plan [Matt Lucero 'never 100'; Unlimited B2B floor]"
+      },
+      "our_current_score": 5,
+      "score_rationale": "Aggregate design is right — 500/day (15K/mo) clears the 6K minimum and approaches the 20K 'serious' bar, 5-9min spacing matches the randomized-interval guidance, stop-on-reply is on, and 6am-6pm ET covers the Belkins morning window. But 50/inbox/day on ~3-week-old inboxes is double the 20-30 consensus and 5-25x the AutoUp ramp guidance, with zero spare warmed capacity — the volume is being borrowed against domain health, which is the definition of the 5-6 band.",
+      "top_optimization": "Same 500/day, more inboxes: add 2-3 domains / 8-10 inboxes (~$50 one-time + ~$40/mo at reseller rates) to bring per-inbox load to 25/day, and keep 2 inboxes as a benched warm spare per Lucero's 2x-spare rule."
+    },
+    {
+      "stage": "reply_handling",
+      "what_top_performers_do": [
+        "Speed is the lever: respond to interested replies within 5 minutes (warm-call if possible) [BEST Strategy 2026; xtreme_gen_ai: 100x opportunity cost; Hormozi: 60-second speed-to-lead, +391% HBR]",
+        "Answer their questions FIRST, then offer 2 specific times in their timezone — don't just fire a link [Matt Lucero]",
+        "Follow-ups matter but decay hard: 58% of replies from email 1, 42% from follow-ups [Instantly]; 6/2/1 interested-lead decay across emails 1-3 [Lucero]; first follow-up adds 40-65% more replies [Instantly; Woodpecker]",
+        "Work the master inbox 30min-2hrs daily; follow up hot leads every 2-5 days; export openers/repliers into new campaigns with new angles [Lucero; Instantly tutorial]",
+        "Multi-channel escalation on engagement: push non-replying openers to LinkedIn, enrich mobile only after interested reply → warm call [AutoUp; BEST Strategy 2026]"
+      ],
+      "benchmark_bands": {
+        "score_9_10": "Sub-5-minute response with question-answering before link-drop, phone/LinkedIn escalation on interest, hot-lead cadence every 2-5 days, opener/replier recycling into new angles [Lucero; BEST Strategy 2026; Hormozi]",
+        "score_7_8": "Fast (same-hour) classified responses, clean interested/not routing, human follow-through on conversations — but single-channel and no hot-lead cadence automation [Instantly tutorial unibox standard]",
+        "score_5_6": "Replies worked within the day, manual triage, no systematic follow-up cadence on interested-but-stalled threads [Lucero 30min-2hr floor]",
+        "score_below": "Replies sit >24h, no classification, no follow-up on interested leads that go quiet [speed-to-lead body of evidence]"
+      },
+      "our_current_score": 7,
+      "score_rationale": "Instant Claude classification + auto-reply beats every speed benchmark in the corpus (5-minute standard, 60-second Hormozi ideal), and Slack cards with research give the human layer context — that's firmly 7-8 band. It misses higher because the bot fires a tool+booking link on ANY positive without answering the prospect's actual question first (Lucero's explicit anti-pattern), there's no 2-5 day hot-lead cadence for interested-then-silent threads, and no multi-channel escalation — though with 0 human positives at day 2, the system is also entirely unexercised.",
+      "top_optimization": "Add a question-detection branch: if the positive reply contains a question, the auto-reply answers it (Claude already classified it) BEFORE the link; and schedule an automatic day-3 re-touch on any interested thread with no booking — both pure workflow changes, zero cost."
+    },
+    {
+      "stage": "booking",
+      "what_top_performers_do": [
+        "Treat booked-call-to-show as a funnel: Calendly pre-qual form (cancel non-fits), confirmation page with VSL/case studies, 7-8 objection-handling nurture emails between booking and call, text/email reminders [Aaron/Client Ascension; 1.5M/month sender]",
+        "Low-commitment CTAs book best: 5-minute phone call beats 30-minute meeting asks; interest-based CTA converts 15% to meetings at cold stage across 304K emails [Matt Lucero; Gong]",
+        "40-60% of positive replies should convert to booked meetings [lemlist]; interested leads book 20-30% via email alone, ~50% with phone added [Lucero]",
+        "Sequence step 3 books more meetings than steps 1+2 combined — the booking push belongs later in the thread [Belkins follow-up stats]",
+        "Abundant availability: 15-min slots with 5-min buffers so speed-to-book never dies on calendar friction [Hormozi]; minority position (Sam McKenna): never send a calendar link at all — but link-with-qualification is the volume-sender majority"
+      ],
+      "benchmark_bands": {
+        "score_9_10": "Pre-qual form gating the calendar, confirmation page with proof assets, 7-8 booking-to-call nurture emails, automated reminders, no-show rebooking flow, 40-60% positive-to-booked hit [Aaron; lemlist; 1.5M sender]",
+        "score_7_8": "Frictionless calendar with reminders and at least a light nurture touch between booking and call; positive-to-booked tracked against the 40-60% bar [lemlist benchmark]",
+        "score_5_6": "Calendar link delivered promptly but naked — no qualification, no nurture, no reminders, no no-show handling; booking rate untracked [gap vs Aaron's full pre-call funnel]",
+        "score_below": "30-min meeting ask in email 1, or no booking mechanism at all [Lucero CTA rankings; Hormozi anti-pattern]"
+      },
+      "our_current_score": 3,
+      "score_rationale": "We have exactly one piece of the booking machine: a GHL calendar link in the auto-reply. Everything the corpus says converts bookings into held calls is absent — no pre-qual form, no confirmation-page proof assets, none of the 7-8 nurture emails Aaron and the 1.5M/mo sender both independently prescribe, no reminders, no no-show handling. With 0 bookings yet the cost is invisible, but the first positives will leak straight through this hole, so it scores below the naked-link 5-6 band's tracking requirement.",
+      "top_optimization": "Build the GHL booking-to-call flow NOW while volume is low: 2-3 question qualification on the calendar form, plus a 3-email GHL nurture (case study, tool walkthrough, objection pre-handle) and SMS+email reminders — all native GHL, zero new tooling, directly targets the 20-30%→50% show-rate delta Lucero documents."
+    }
+  ],
+  "summary": {
+    "scores": {
+      "sourcing": 7,
+      "contacts": 5,
+      "verification": 5,
+      "personalization": 7,
+      "offer": 8,
+      "copy": 7,
+      "deliverability": 4,
+      "sending_volume": 5,
+      "reply_handling": 7,
+      "booking": 3
+    },
+    "average": 5.8,
+    "three_biggest_gaps": [
+      {
+        "gap": "Deliverability infrastructure fragility (score 4)",
+        "detail": "Open+click tracking on with no custom tracking domain, 50/inbox/day (2x consensus) on 3-week-old inboxes, and only 2 domains = one blacklist event kills 50% of capacity. Strong current opens (53-61%) mask borrowed-against-domain-health risk; AutoUp documents exactly this profile collapsing overnight.",
+        "fix_cost": "~1 day + ~$50 one-time"
+      },
+      {
+        "gap": "Booking funnel is a naked link (score 3)",
+        "detail": "No pre-qual, no nurture, no reminders, no no-show handling. Two independent practitioners (Aaron, 1.5M/mo sender) prescribe the identical 7-8-email pre-call funnel; lemlist's 40-60% positive-to-booked bar is untrackable without it. First human positives will leak here.",
+        "fix_cost": "Half day in GHL, zero new tooling"
+      },
+      {
+        "gap": "Contact identity + mailbox verification (scores 5/5)",
+        "detail": "64% coverage vs 70% benchmark, role/info@ skew with no owner-name resolution, and no SMTP verification while bounce (1.7-2.3%) straddles the <2% ceiling with zero margin on a 2-domain fleet. Verified lists get ~2x replies (Woodpecker); MillionVerifier costs ~$1.80/day at current volume.",
+        "fix_cost": "~$55/mo verification + free registry owner-name layer"
+      }
+    ]
+  }
+}

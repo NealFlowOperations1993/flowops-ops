@@ -1,0 +1,1695 @@
+{
+  "instance": "FlowOperations n8n (exaltisgroup) — https://flowoperations.app.n8n.cloud",
+  "generated": "2026-08-23",
+  "workflow_count": 112,
+  "active_count": 38,
+  "systems": {
+    "COLD_EMAIL": {
+      "title": "COLD EMAIL (Brutus / FlowOps lead engine)",
+      "workflow_count": 15,
+      "workflows": [
+        {
+          "id": "0qkPeKHq1siM4yh5",
+          "name": "Cold Email Lead Generation Pipeline",
+          "active": true,
+          "system": "COLD_EMAIL",
+          "trigger": "/apify-lead-pipeline (webhook, fired by Apify run-completed)",
+          "services": [
+            "apify.com",
+            "smartlead.ai",
+            "supabase.co",
+            "openrouter",
+            "slack"
+          ],
+          "purpose": "On Apify run completion, fetches the dataset, filters leads against ICP and detects niche, checks Supabase suppression, generates OpenRouter personalization, mirrors leads to Supabase and pushes to Smartlead campaigns, then Slack-notifies.",
+          "modifiable": true,
+          "reusable_components": "Entire workflow is the reference implementation: Apify dataset fetch from webhook payload, ICP filter + niche detection code, Supabase suppression check, OpenRouter personalization call, Smartlead lead-push API pattern, Slack notify."
+        },
+        {
+          "id": "61ZkxnoZBrYOGfZK",
+          "name": "FlowOps · Phase 0 — Lead Generation (Apify → Smartlead + Reply→Slack)",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "cron: every 6 hours (sourcing branch) + /smartlead-reply (webhook, reply branch)",
+          "services": [
+            "apify.com",
+            "smartlead.ai",
+            "slack"
+          ],
+          "purpose": "Earlier-gen lead engine: loops configured niches, scrapes each via Apify run-sync, maps to Smartlead lead schema, POSTs to campaign; separate branch receives Smartlead reply webhooks and posts to Slack.",
+          "modifiable": true,
+          "reusable_components": "Niche-config loop with splitInBatches, Apify→Smartlead field-mapping code, Smartlead add-leads endpoint call, Smartlead reply-webhook → Slack notify branch"
+        },
+        {
+          "id": "I9knmvWukp2PKlCF",
+          "name": "FlowOps Backfill Personalization V2",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "cron */10 * * * *",
+          "services": [
+            "smartlead.ai",
+            "anthropic",
+            "slack"
+          ],
+          "purpose": "Every 10 min, loops Smartlead campaigns, fetches leads with cursor persistence, calls Anthropic (tool-use) to generate 9 personalization variables per lead, validates keys, PATCHes the lead back into Smartlead, and Slack-alerts on failures.",
+          "modifiable": true,
+          "reusable_components": "Everything: Smartlead leads fetch + cursor-persist code, Anthropic tool-use personalization with 9-key validation, Smartlead lead-update call, failure summarization + Slack alert. This is the canonical personalization-backfill engine."
+        },
+        {
+          "id": "IKbHDsYF7ifcXVbT",
+          "name": "FlowOps Backfill Personalization",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "cron */10 * * * *",
+          "services": [
+            "smartlead.ai",
+            "anthropic"
+          ],
+          "purpose": "V1 monolith of the personalization backfill: single code node with hardcoded Smartlead + Anthropic API keys, 10 campaign IDs, niche labels, and the founder-tone 9-key personalization system prompt; fetches, personalizes, and updates leads inline. Superseded by V2. NOTE: live API keys are hardcoded in the code node.",
+          "modifiable": true,
+          "reusable_components": "The 9-key personalization system prompt (tone rules, niche labels, city/state pain references) and the campaign-ID/niche mapping — directly reusable in the cold-email engine; keys should be moved to credentials"
+        },
+        {
+          "id": "NvQC9GvwVJXtxefG",
+          "name": "Cold Email Lead Intake Pipeline",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "webhook /leads-intake",
+          "services": [
+            "google sheets"
+          ],
+          "purpose": "Receives a leads array via webhook, responds 200 immediately, splits, dedupes, normalizes fields in a code node, filters to has-email, and appendOrUpdates rows into a Google Sheet (doc 1c3nAyqgji..., tab Leads).",
+          "modifiable": true,
+          "reusable_components": "The whole thing: webhook intake → splitOut → removeDuplicates → field normalization code → has-email gate → Sheets appendOrUpdate is a ready-made lead-ingestion front door for a cold-email engine."
+        },
+        {
+          "id": "QVMajRvX1TKB7r0d",
+          "name": "Daily Apify Niche Scrapes (FlowOps)",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "cron daily at hour 11 UTC (6 AM ET)",
+          "services": [
+            "apify.com"
+          ],
+          "purpose": "Daily schedule fires a code node that kicks off Apify niche scrape runs (lead sourcing for FlowOps).",
+          "modifiable": true,
+          "reusable_components": "Daily-cron → programmatic Apify actor kickoff from a code node — the seed of the automated daily lead-sourcing loop."
+        },
+        {
+          "id": "TH6uS1Phh8jZCmTG",
+          "name": "B30 Reply Pipeline",
+          "active": true,
+          "system": "COLD_EMAIL",
+          "trigger": "webhook /brutus-reply",
+          "services": [
+            "smartlead.ai",
+            "anthropic",
+            "supabase",
+            "apify",
+            "slack"
+          ],
+          "purpose": "Smartlead EMAIL_REPLY webhook: parses reply, Claude classifies intent (POSITIVE_HIGH..SPAM, JSON with confidence + suggested reply), inserts reply row and handles unsubscribe suppression in Supabase (brutus schema), auto-sends Smartlead reply only if POSITIVE_HIGH & confidence>=0.90 & thread_position>=2, scrapes company site/news signals (Apify rag-web-browser + direct fetch), posts rich Slack card and stores thread ref back to Smartlead lead. Note: hardcoded Anthropic, Smartlead, Apify, and Supabase service-role keys live in code nodes.",
+          "modifiable": true,
+          "reusable_components": "Entire workflow is the cold-email reply engine: Claude JSON intent classifier prompt, auto-send guardrail logic, Supabase suppression handling, Smartlead reply-email-thread API call, Apify rag-web-browser research-signal enrichment, Slack Block Kit reply card"
+        },
+        {
+          "id": "WNE56YhjuWqmjfAO",
+          "name": "Qualification Call Booked — Slack Notification + Research",
+          "active": true,
+          "system": "COLD_EMAIL",
+          "trigger": "/qualification-call-booked",
+          "services": [
+            "slack",
+            "smartlead.ai"
+          ],
+          "purpose": "GHL appointment webhook → extracts lead/appointment data, looks up the lead's Smartlead custom fields (slack_message_ts/slack_channel) to find the original reply thread, and posts a Block Kit call card into that Slack thread (fallback channel C0AMW0J3X6X).",
+          "modifiable": true,
+          "reusable_components": "Smartlead lead lookup-by-email pattern; storing Slack thread_ts/channel in Smartlead custom fields for reply-thread continuity; Slack Block Kit call-card posting with thread fallback."
+        },
+        {
+          "id": "ZU82mBlxlxS0rLRv",
+          "name": "Cold Email Lead Generation Pipeline",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "/apify-lead-pipeline",
+          "services": [
+            "apify.com",
+            "smartlead.ai (payload built, push node not connected)"
+          ],
+          "purpose": "Apify run-finished webhook → fetches the run's dataset, filters leads by ICP (decision-maker titles, blocks role emails, company_size<200), normalizes fields into Smartlead lead schema, batches, builds Smartlead payload — final push node intentionally not connected ('Create a Smartlead campaign then connect the Push node').",
+          "modifiable": true,
+          "reusable_components": "Entire skeleton is a cold-email lead engine: Apify webhook→dataset fetch, ICP title/role-email/company-size filter, field normalization to Smartlead lead_list shape with settings (dont_email_unsubscribed_leads), batch splitting."
+        },
+        {
+          "id": "ZgoPlGB1dlkheTlL",
+          "name": "B01 — Hiring Ops Signal Scraper",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "0 6 * * *",
+          "services": [
+            "apify.com",
+            "supabase.co",
+            "slack"
+          ],
+          "purpose": "Daily runs Apify Indeed scraper (misceres~indeed-scraper) across 5 ops-role queries with async start→poll→dataset-fetch, parses/filters postings for ops-hiring signals, dedupes and inserts into Supabase signals table, posts a Slack daily report.",
+          "modifiable": true,
+          "reusable_components": "Apify actor invocation with polling loop and dataset fetch (in-code, token inline); Supabase dedupe-then-insert signal storage; hiring-signal keyword filter; Slack daily report."
+        },
+        {
+          "id": "aIXwzranxRF3krQn",
+          "name": "B22 — Smartlead Push",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "/brutus-push",
+          "services": [
+            "smartlead.ai",
+            "supabase.co",
+            "slack"
+          ],
+          "purpose": "Brutus push webhook (responds 202 immediately) → validates contacts require smartlead_campaign_id/sequence_id, checks Supabase is_suppressed RPC per contact, groups allowed leads by campaign in batches of 100, POSTs to Smartlead campaigns/{id}/leads, writes send events + marks signals sent in Supabase, logs suppressed, Slack batch report.",
+          "modifiable": true,
+          "reusable_components": "Suppression check via Supabase RPC before send; campaign-grouped 100-lead batching; Smartlead add-leads API call; send-event ledger writes; async 202-then-process webhook pattern — this IS the push stage of a cold-email lead engine."
+        },
+        {
+          "id": "c6g1Sjv2yab4OFKD",
+          "name": "Smartlead → Slack: New Lead Notification",
+          "active": true,
+          "system": "COLD_EMAIL",
+          "trigger": "webhook /a5b4c001-1f84-4f37-8167-01d9fb93c3af (Smartlead webhook)",
+          "services": [
+            "smartlead.ai (inbound webhook)",
+            "slack"
+          ],
+          "purpose": "Receives a Smartlead event via webhook and posts a new-lead notification to Slack. Two nodes: Webhook → Slack.",
+          "modifiable": true,
+          "reusable_components": "Smartlead webhook intake → Slack notify pattern; directly reusable as the reply/interest notification tail of a cold-email engine."
+        },
+        {
+          "id": "fPkU2gxayKtHLfdF",
+          "name": "B11 — Enrichment + Suppression",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "webhook /brutus-enrich (POST) + hourly cron 0 * * * *",
+          "services": [
+            "supabase.co (brutus schema signal_events)",
+            "findymail/apollo/anymailfinder/hunter/millionverifier (waterfall — keys are PASTE_ placeholders, not wired)",
+            "slack",
+            "n8n webhook forward to /brutus-push (B22)"
+          ],
+          "purpose": "Brutus pipeline stage: pulls pending signal_events from Supabase, marks them enriching, runs an email-enrichment waterfall (Findymail→Apollo→Anymailfinder→Hunter→MillionVerifier), persists results with suppression/no-email filtering, forwards ready contacts to B22 via /brutus-push, and posts a Slack report. Waterfall API keys are unfilled placeholders.",
+          "modifiable": true,
+          "reusable_components": "The whole thing: enrichment waterfall code node, Supabase signal_events state machine (pending→enriching→done/failed), suppression filter, webhook+hourly-sweep dual trigger, forward-to-next-stage handoff, Slack run report. Core building block for the cold-email lead engine — note keys must be filled."
+        },
+        {
+          "id": "v4qtQEozBVJ7wkFc",
+          "name": "Apify Rotation Dispatcher - 400 Leads/Day",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "cron 0 11 * * * (daily 6AM ET)",
+          "services": [
+            "smartlead.ai",
+            "apify",
+            "exaltisgroup n8n webhook (apify-lead-pipeline)"
+          ],
+          "purpose": "Daily gate: checks Smartlead for >=5 ACTIVE-warmup mailboxes, then deterministically rotates 4 niche/city pairs (10 niches x 10 cities, day-of-year offset) and fires Apify google-maps-with-contact-details runs (100 places each) with ACTOR.RUN.SUCCEEDED/FAILED webhooks pointed at /apify-lead-pipeline.",
+          "modifiable": true,
+          "reusable_components": "Smartlead mailbox-health gate, deterministic niche/city rotation, Apify actor invocation with completion webhooks carrying niche/city context — the core of a cold-email lead-sourcing engine."
+        },
+        {
+          "id": "xXlxFQFF86lX2Ykj",
+          "name": "B22 — Smartlead Push",
+          "active": false,
+          "system": "COLD_EMAIL",
+          "trigger": "webhook /brutus-push",
+          "services": [
+            "smartlead.ai",
+            "supabase",
+            "slack"
+          ],
+          "purpose": "Receives lead batches (responds 202 immediately), validates/expands, runs Supabase RPC is_suppressed per lead, pushes allowed leads to Smartlead campaign /leads endpoint in batches of 100, writes send_events, marks signal events sent, logs suppressed leads, Slack summary.",
+          "modifiable": true,
+          "reusable_components": "Whole workflow: async 202-webhook intake, suppression check via Supabase RPC, batched Smartlead lead upload, send_events audit trail, suppressed-lead logging — purpose-built cold-email push infrastructure."
+        }
+      ]
+    },
+    "NUCLEUS_READONLY": {
+      "title": "NUCLEUS — W-SERIES [READ-ONLY]",
+      "workflow_count": 19,
+      "workflows": [
+        {
+          "id": "2YaQs0YAz5AmDP0Z",
+          "name": "W07 — YouTube Scraper",
+          "active": false,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "/scraper-youtube (webhook)",
+          "services": [
+            "apify.com",
+            "supabase.co",
+            "slack",
+            "n8n webhook chain (hook-tagger)"
+          ],
+          "purpose": "Runs Apify streamers~youtube-scraper via run-sync-get-dataset-items, parses results, saves to Supabase corpus_entries_raw, chains to the hook-tagger webhook, Slack notify. Content-engine corpus ingestion.",
+          "modifiable": false,
+          "reusable_components": "Apify run-sync-get-dataset-items invocation pattern (synchronous actor call, no polling needed) and Supabase REST insert — pattern is reusable, workflow itself is read-only"
+        },
+        {
+          "id": "4ayRollLDqc2i0Iy",
+          "name": "W16 — Engine 3 Ads Batch (Weekly)",
+          "active": true,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "cron: weekly Monday 08:00 UTC (plus manual webhook /ads-batch)",
+          "services": [
+            "supabase.co",
+            "anthropic",
+            "n8n webhook chain (output-delivery)"
+          ],
+          "purpose": "Weekly per-client ad batch generation: pulls active paid-ads clients + ICP/corpus snapshot from Supabase, runs a 3-pass Claude chain (strategy → draft → validate), saves outputs to Supabase, triggers W20 delivery.",
+          "modifiable": false,
+          "reusable_components": "Multi-pass Claude prompt chain with validation code nodes, and splitInBatches per-client loop — pattern reusable, workflow read-only"
+        },
+        {
+          "id": "7IELdwez8oHe1v13",
+          "name": "W02 — Live Call Ingest",
+          "active": true,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "/live-call-ingest (webhook)",
+          "services": [
+            "supabase.co",
+            "slack",
+            "n8n webhook chain (icp-synthesis)"
+          ],
+          "purpose": "Ingests live-call transcripts: validates payload, saves to Supabase live_call_transcripts, updates client lifecycle row, triggers W03 ICP synthesis, Slack-notifies Neal.",
+          "modifiable": false,
+          "reusable_components": "none (Supabase upsert-by-slug pattern is generic; workflow read-only)"
+        },
+        {
+          "id": "CS3hNOZCbXNBv4fk",
+          "name": "Nucleus — Client vs Competitor Multi-Source Scrape",
+          "active": false,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "webhook /nucleus-scrape",
+          "services": [
+            "apify.com",
+            "anthropic",
+            "supabase.co",
+            "slack",
+            "google drive"
+          ],
+          "purpose": "Shared-secret-verified webhook takes client+competitor entities, uses an Anthropic agent to detect social platforms from each site, builds per-platform Apify scrape jobs (Reddit/IG/FB/Twitter with Reddit fallback actor), dedupes/filters, archives to Drive, ingests into Supabase nucleus-ingest edge fn, and posts a Slack digest.",
+          "modifiable": false,
+          "reusable_components": "Apify run-sync-get-dataset-items invocation with actor routing and fallback; webhook shared-secret verification + 401/202 responses; dedupe-across-runs node; Slack digest builder"
+        },
+        {
+          "id": "DPFhUvwCvgWjYs4f",
+          "name": "W18 — Performance Ingest",
+          "active": false,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "cron daily 02:00 UTC",
+          "services": [
+            "supabase.co",
+            "smartlead.ai",
+            "slack"
+          ],
+          "purpose": "Daily pulls active clients from Supabase, for clients with the cold-email engine fetches Smartlead campaign stats (code node), saves performance_events rows to Supabase, and posts a Slack daily report.",
+          "modifiable": false,
+          "reusable_components": "Smartlead stats-fetch code pattern and per-client batching with Supabase performance_events persistence (read-only reference — W-series, do not modify)"
+        },
+        {
+          "id": "PMimK77BQxk0p6l8",
+          "name": "W11 — Job Board Scraper",
+          "active": false,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "webhook /scraper-job-board",
+          "services": [
+            "apify.com (misceres~indeed-scraper)",
+            "supabase.co",
+            "slack"
+          ],
+          "purpose": "Webhook-triggered: builds an Indeed search, kicks off the Apify Indeed scraper actor run, records the run in Supabase scraper_runs table, and notifies Slack. W-prefixed Nucleus infrastructure — read-only.",
+          "modifiable": false,
+          "reusable_components": "Apify actor invocation pattern (POST /v2/acts/{actor}/runs?token=) plus run-tracking row in Supabase — directly reusable for lead-sourcing scrapes (e.g. hiring-signal targeting for cold email), but copy it rather than modify this workflow."
+        },
+        {
+          "id": "Rmogbcmjui394rFm",
+          "name": "Nucleus - Client Asset Transcription & Intelligence Extraction",
+          "active": false,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "NONE",
+          "services": [
+            "assemblyai",
+            "anthropic",
+            "google drive",
+            "google docs",
+            "google sheets",
+            "slack"
+          ],
+          "purpose": "n8n form intake of client media assets; downloads from Drive, transcribes via AssemblyAI polling loop, runs Claude (Opus) structured extraction into a Nucleus doc, writes Google Doc + JSON to Shared Drive, appends registry row to Sheets, notifies Slack; error trigger posts to Slack.",
+          "modifiable": false,
+          "reusable_components": "AssemblyAI upload/start/poll-with-Wait pattern; structured-output Claude chain with schema parser; Google Drive doc creation via raw googleapis HTTP; error-trigger-to-Slack alerting"
+        },
+        {
+          "id": "Xyx8OPuQEvB34ZPK",
+          "name": "W03 — ICP Synthesis (Claude Opus)",
+          "active": true,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "/icp-synthesis",
+          "services": [
+            "supabase.co",
+            "anthropic",
+            "slack"
+          ],
+          "purpose": "Pulls client record, form submissions and call transcript from Supabase, builds an ICP-synthesis prompt, calls Claude, validates output, saves icp_docs row, updates client lifecycle, Slack-notifies Neal (missing fields or ready).",
+          "modifiable": false,
+          "reusable_components": "Supabase REST fetch/insert patterns; Claude call with output validation + missing-field gating; the ICP doc itself feeds a cold-email engine (W15 reads icp_docs)."
+        },
+        {
+          "id": "Xzh21ax4GJ0y0GFG",
+          "name": "W15 — Engine 2 Cold Email Batch",
+          "active": true,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "/cold-email-batch",
+          "services": [
+            "supabase.co",
+            "anthropic"
+          ],
+          "purpose": "For a client with cold_email engine active: fetches ICP doc + weekly corpus snapshot from Supabase, runs a 3-pass Claude chain (architecture → drafts → validate), assembles a cold-email sequence, saves to outputs table, then triggers W20 output-delivery webhook.",
+          "modifiable": false,
+          "reusable_components": "3-pass Claude generation chain (architecture/draft/validate) for cold-email sequence copy; engine-active gating; webhook chaining to a delivery workflow — strong template for a lead-engine copy stage (read-only, would need cloning)."
+        },
+        {
+          "id": "dRq9YbrOcHJnoGXr",
+          "name": "W09 — Ad Libraries Scraper",
+          "active": false,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "webhook /scraper-ad-library (POST)",
+          "services": [
+            "apify (facebook-ads-scraper actor)",
+            "supabase.co (scraper_runs table)",
+            "slack"
+          ],
+          "purpose": "Kicks off an Apify facebook-ads-scraper run for configured competitors, records the run in Supabase scraper_runs, notifies Slack. Part of the W-series content engine.",
+          "modifiable": false,
+          "reusable_components": "Apify actor kickoff pattern (POST /v2/acts/{actor}/runs?token=) plus Supabase run-tracking row — the exact fire-and-track shell a cold-email Apify lead scraper needs (copy the pattern, do not modify this workflow)."
+        },
+        {
+          "id": "nxTAfAmGN97szqOA",
+          "name": "W10 — Competitor Landing Pages Scraper",
+          "active": false,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "webhook /scraper-competitor-lps (POST)",
+          "services": [
+            "apify (website-content-crawler actor)",
+            "supabase.co (scraper_runs)",
+            "slack"
+          ],
+          "purpose": "Kicks off an Apify website-content-crawler run against competitor landing pages, logs the run to Supabase scraper_runs, notifies Slack. W-series content engine.",
+          "modifiable": false,
+          "reusable_components": "Same Apify kickoff + Supabase scraper_runs tracking + Slack notify shell as W09 — copyable template for a website-crawl lead-research step (read-only; copy, don't modify)."
+        },
+        {
+          "id": "q4lFP1ccv9m4T6HE",
+          "name": "W13 - Weekly Corpus Synthesis",
+          "active": true,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "schedule: weekly Monday 06:00 UTC",
+          "services": [
+            "supabase",
+            "anthropic",
+            "slack"
+          ],
+          "purpose": "For each active niche in Supabase, pulls the week's tagged corpus entries, calls Claude to synthesize a weekly snapshot, saves to corpus_weekly_snapshots, reports to Slack.",
+          "modifiable": false,
+          "reusable_components": "Per-niche splitInBatches loop with Supabase REST reads + Claude synthesis call pattern (read-only reference)."
+        },
+        {
+          "id": "qbhw3TyP8A7Z89eV",
+          "name": "W05 — Reddit Scraper",
+          "active": false,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "webhook /scraper-reddit",
+          "services": [
+            "apify",
+            "supabase",
+            "slack"
+          ],
+          "purpose": "Webhook-triggered: builds an Apify actor input, kicks off an Apify Reddit scrape run, records the pending run in Supabase scraper_runs, notifies Slack.",
+          "modifiable": false,
+          "reusable_components": "Apify actor kick-off via POST /v2/acts/{actor}/runs with run tracking in a Supabase scraper_runs table — directly reusable pattern for lead sourcing (read-only, copy don't modify)."
+        },
+        {
+          "id": "s7amPRr1dbRP7FVW",
+          "name": "W17 - Landing Page Generator",
+          "active": true,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "webhook /landing-page-generator",
+          "services": [
+            "supabase",
+            "anthropic",
+            "slack"
+          ],
+          "purpose": "On webhook, fetches client + ICP docs and latest corpus snapshot from Supabase, runs a 3-pass Claude chain (architecture, full copy, validation), saves the landing page to outputs and notifies Slack.",
+          "modifiable": false,
+          "reusable_components": "3-pass Claude generation/validation chain and ICP-doc-driven prompt building (copy pattern only)."
+        },
+        {
+          "id": "tSkTh2PdsFH2yFYq",
+          "name": "W06 — Review Sites Scraper",
+          "active": false,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "webhook /scraper-reviews",
+          "services": [
+            "apify",
+            "supabase",
+            "slack"
+          ],
+          "purpose": "Webhook-triggered: builds Apify request for review-site scraping, starts the run, saves pending run to Supabase scraper_runs, notifies Slack.",
+          "modifiable": false,
+          "reusable_components": "Same Apify run-dispatch + scraper_runs tracking pattern as W05 — reusable for lead-source scraping (copy only)."
+        },
+        {
+          "id": "tqalhKlrlE9Njyvq",
+          "name": "W20 — Output Delivery",
+          "active": true,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "webhook /output-delivery",
+          "services": [
+            "slack",
+            "supabase"
+          ],
+          "purpose": "Receives a batch delivery request, routes by engine, posts deliverables to the client's Slack channel, marks outputs delivered and updates client first-batch timestamp in Supabase, notifies Neal.",
+          "modifiable": false,
+          "reusable_components": "Slack client-channel delivery + Supabase batch status update pattern; marginal for cold email."
+        },
+        {
+          "id": "uwWkVbjaFv5EL03E",
+          "name": "W12 - Hook Framework Tagger",
+          "active": true,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "webhook /hook-tagger",
+          "services": [
+            "anthropic",
+            "supabase",
+            "slack"
+          ],
+          "purpose": "Webhook-triggered: builds a Claude prompt to tag raw corpus entries against the hook framework, parses tags, writes to corpus_entries_tagged, updates raw entry status, notifies Slack.",
+          "modifiable": false,
+          "reusable_components": "Claude batch-tagging with parse + dual Supabase write (tagged table + status flip) pattern."
+        },
+        {
+          "id": "wOnPobJNkux2t58X",
+          "name": "W14 — Engine 1 Content Batch (Weekly)",
+          "active": true,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "schedule: weekly Monday 08:00 UTC",
+          "services": [
+            "supabase",
+            "anthropic",
+            "slack",
+            "n8n webhook (W20 output-delivery)"
+          ],
+          "purpose": "Weekly: loops active content clients from Supabase, merges signed-off ICP doc + corpus snapshot, runs Claude Pass 1 strategy (with validation gate), Pass 2 drafting in batches of 5, Pass 3 validation, saves outputs and triggers W20 delivery; Slack alerts on completion/failure.",
+          "modifiable": false,
+          "reusable_components": "Multi-pass Claude generate/validate pipeline with a validity gate and batch-of-5 processing (copy pattern only)."
+        },
+        {
+          "id": "z9l9iL5u7cvFPYq1",
+          "name": "W17 — Landing Page Generator (older variant)",
+          "active": false,
+          "system": "NUCLEUS_READONLY",
+          "trigger": "webhook /landing-page-generator (same path as active s7amPRr1dbRP7FVW — inactive duplicate)",
+          "services": [
+            "supabase",
+            "anthropic",
+            "n8n webhook (W20 output-delivery)"
+          ],
+          "purpose": "Older/inactive duplicate of W17: fetch client+ICP and corpus_snapshots from Supabase, 3-pass Claude LP generation, save to outputs and trigger W20 delivery.",
+          "modifiable": false,
+          "reusable_components": "Same 3-pass Claude pattern as the active W17; nothing additional."
+        }
+      ]
+    },
+    "CONTENT_ENGINE_READONLY": {
+      "title": "CONTENT ENGINE [READ-ONLY]",
+      "workflow_count": 11,
+      "workflows": [
+        {
+          "id": "6PBptEpybhdJh6eH",
+          "name": "🤖Content Creator Agent",
+          "active": false,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "NONE (executeWorkflowTrigger — called by another workflow)",
+          "services": [
+            "openai",
+            "tavily"
+          ],
+          "purpose": "Sub-workflow LangChain agent: GPT-4o agent with Tavily search tool that produces content when invoked by a parent workflow.",
+          "modifiable": false,
+          "reusable_components": "none (OpenAI-based; OpenRouter rule would apply to any reuse anyway)"
+        },
+        {
+          "id": "ETqj4m7RnxG45QOu",
+          "name": "W14 - Engine 1 Content Batch",
+          "active": false,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "cron Mondays 08:00 UTC (plus manual webhook /content-batch)",
+          "services": [
+            "supabase.co",
+            "anthropic"
+          ],
+          "purpose": "Weekly per-client content batch: reads clients+ICP docs and corpus snapshot from Supabase, two-pass Claude generation (strategy then draft), saves outputs to Supabase and triggers W20 delivery webhook.",
+          "modifiable": false,
+          "reusable_components": "Two-pass Claude prompt pipeline (strategy → draft) with validation code nodes; per-client splitInBatches loop (reference only — W-series read-only)"
+        },
+        {
+          "id": "IbdX6AoHDqqb0czz",
+          "name": "FlowOps - Slack Interactive Callback Handler",
+          "active": true,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "webhook /slack-interactive",
+          "services": [
+            "slack",
+            "heygen",
+            "leadconnectorhq/GHL"
+          ],
+          "purpose": "Receives Slack interactive button callbacks, routes by callback type (video/carousel/animated approvals), on approval fetches the Slack thread, extracts the script, fires HeyGen video generation, and queues social posts via GHL social-media-posting accounts; posts acks/rejects back to Slack.",
+          "modifiable": false,
+          "reusable_components": "Slack interactive-webhook pattern (respond-immediately then process), Slack payload parsing + switch routing by callback type, chat.postMessage approval/ack posting — reusable for a Slack-approved cold-email send/review loop."
+        },
+        {
+          "id": "MPljcl3qhizRKYch",
+          "name": "FlowOps - Daily X Auto-Publisher",
+          "active": false,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "webhook /x-auto-publish",
+          "services": [
+            "x/twitter (api.x.com)",
+            "slack"
+          ],
+          "purpose": "Webhook receives a batch of tweets, splits them, posts each to X via api.x.com/2/tweets, and confirms each in Slack.",
+          "modifiable": false,
+          "reusable_components": "splitInBatches sequential-posting loop with per-item Slack confirmation — same shape as rate-limited sequential lead upload/notify."
+        },
+        {
+          "id": "SDajKtPcJmDYQkMz",
+          "name": "W08 — Short Video Scraper (TikTok)",
+          "active": false,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "webhook /scraper-short-video",
+          "services": [
+            "apify",
+            "supabase",
+            "slack"
+          ],
+          "purpose": "Kicks off an Apify TikTok scraper actor run and records the pending run in Supabase scraper_runs table, then notifies Slack; async — a downstream workflow presumably harvests results.",
+          "modifiable": false,
+          "reusable_components": "Apify actor kick-off via /v2/acts/{id}/runs with run-id persisted to Supabase for async harvest — directly reusable for lead-source scraping"
+        },
+        {
+          "id": "SF1vMrGgWpHCOKv2",
+          "name": "W01 - Async Form Handler",
+          "active": true,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "webhook /async-form-handler",
+          "services": [
+            "supabase",
+            "slack"
+          ],
+          "purpose": "Receives client async form submissions, upserts client record and saves submission to Supabase (uuhnhybmdsyzppiuhlvk), notifies Neal on Slack.",
+          "modifiable": false,
+          "reusable_components": "Supabase REST upsert pattern with Prefer headers; webhook-to-DB-to-Slack notification skeleton"
+        },
+        {
+          "id": "SY7yayRHbj4EZ06K",
+          "name": "W04 - Niche Corpus Bootstrap",
+          "active": true,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "webhook /corpus-bootstrap",
+          "services": [
+            "supabase",
+            "n8n webhooks (reddit/youtube scrapers)",
+            "slack"
+          ],
+          "purpose": "Checks if a niche exists in Supabase; if new, creates the niche record and fans out to the Reddit and YouTube scraper workflows via internal webhooks, updates status, Slack-notifies; skips if existing.",
+          "modifiable": false,
+          "reusable_components": "Idempotent exists-check-then-create pattern against Supabase; fan-out orchestration via internal n8n webhook calls — reusable shape for kicking multiple lead-source scrapers per niche"
+        },
+        {
+          "id": "TRaCvLxrTlVRYD9C",
+          "name": "W19 — ICP Refinement Review",
+          "active": true,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "cron weekly Friday 09:00 UTC",
+          "services": [
+            "supabase",
+            "anthropic",
+            "slack"
+          ],
+          "purpose": "Weekly loop over active signed-off clients: pulls 30-day performance_events and latest icp_docs from Supabase, has Claude propose ICP refinements, saves to icp_refinements, posts Neal a Friday briefing to Slack.",
+          "modifiable": false,
+          "reusable_components": "Performance-data + ICP doc → Claude refinement prompt loop (splitInBatches per client) — the exact shape for iterating a cold-email ICP from reply data"
+        },
+        {
+          "id": "Z0XjGAnK7nbXvXc9",
+          "name": "FlowOps Daily Content Pipeline",
+          "active": false,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "0 7 * * *",
+          "services": [
+            "youtube data api",
+            "openai",
+            "slack"
+          ],
+          "purpose": "Daily pulls YouTube trending videos, has OpenAI generate video scripts from them, posts to Slack. Early FlowOps content pipeline, inactive.",
+          "modifiable": false,
+          "reusable_components": "none"
+        },
+        {
+          "id": "ayQkrol5VsAwW4nd",
+          "name": "FlowOps - Sunday X Scheduler 2026-04-19",
+          "active": false,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "10 one-shot crons (Apr 19-20, past — effectively dead)",
+          "services": [
+            "x/twitter api",
+            "slack"
+          ],
+          "purpose": "One-off scheduler: 10 hardcoded date-specific cron triggers each post a tweet via api.x.com/2/tweets and confirm to Slack. Dates are past; effectively dead.",
+          "modifiable": false,
+          "reusable_components": "none"
+        },
+        {
+          "id": "iJ8xFAcDxmmsUGIK",
+          "name": "My workflow 5",
+          "active": false,
+          "system": "CONTENT_ENGINE_READONLY",
+          "trigger": "webhook /nucleus-submission",
+          "services": [
+            "notion"
+          ],
+          "purpose": "Stub: webhook named 'Nucleus' → boilerplate code node (adds myNewField=1) → Notion database page update. Appears to be an unfinished Nucleus submission intake.",
+          "modifiable": false,
+          "reusable_components": "none"
+        }
+      ]
+    },
+    "CLIENT_ONBOARDING": {
+      "title": "CLIENT ONBOARDING (FlowOps internal)",
+      "workflow_count": 20,
+      "workflows": [
+        {
+          "id": "2AEQUUpF7DOrsoOk",
+          "name": "Workflow C — Onboarding Form Submitted",
+          "active": true,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "/onboarding-form (webhook)",
+          "services": [
+            "leadconnectorhq/GHL",
+            "slack"
+          ],
+          "purpose": "Receives onboarding form submissions, derives intelligence-layer fields in code, PUTs the data onto the GHL contact, and posts summaries to the client Slack channel and internal team.",
+          "modifiable": false,
+          "reusable_components": "GHL contact-update httpRequest pattern (services.leadconnectorhq.com/contacts/{id}); Slack posting"
+        },
+        {
+          "id": "2x7L7Y1LUJJ9NhV0",
+          "name": "1. Workflow B — PandaDoc Signed → Client Onboarding",
+          "active": true,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "/pandadoc-signed (webhook)",
+          "services": [
+            "pandadoc (inbound webhook)",
+            "slack",
+            "google drive",
+            "gmail"
+          ],
+          "purpose": "On PandaDoc contract signed: creates client + internal Slack channels, invites client as guest and team members, builds a 4-subfolder Google Drive structure, sends Gmail welcome, posts welcome/notification messages; error branch to Slack.",
+          "modifiable": false,
+          "reusable_components": "Slack channel-create/invite/lookupByEmail httpRequest patterns; error-trigger→Slack alerting pattern"
+        },
+        {
+          "id": "6gIkvVNHbR16vMp2",
+          "name": "Workflow A — GHL Contract Tag → PandaDoc Draft",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "/ghl-contract-tag (webhook)",
+          "services": [
+            "pandadoc",
+            "slack",
+            "leadconnectorhq/GHL (inbound webhook)"
+          ],
+          "purpose": "On GHL contract tag: creates a PandaDoc document from template, waits for processing, sends for signature, Slack-notifies.",
+          "modifiable": false,
+          "reusable_components": "create→wait→send document API sequencing pattern; otherwise none"
+        },
+        {
+          "id": "7y0oWO7q5azteZtp",
+          "name": "Workflow B — GHL Onboarding Booked → Slack + Notion",
+          "active": true,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "/ghl-onboarding-booked (webhook)",
+          "services": [
+            "leadconnectorhq/GHL (inbound webhook)",
+            "slack",
+            "notion"
+          ],
+          "purpose": "On GHL onboarding-call booking: invites team to client Slack channel, posts welcome, sets topic, creates a Notion client progress page.",
+          "modifiable": false,
+          "reusable_components": "Notion page-creation node config; Slack channel setup pattern"
+        },
+        {
+          "id": "8F1Tn4vEhB0ccedA",
+          "name": "Paused: GHL->Webhook->Slack->GDrive->Password Vault Invite",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "/8a80564c-e161-4208-8352-fddb7fcb794c (webhook, GHL-sourced)",
+          "services": [
+            "slack",
+            "google drive",
+            "gmail"
+          ],
+          "purpose": "Older paused onboarding chain: webhook → parse company to channel name → create Slack channel + Drive folder → invite user → Gmail welcome → Slack Connect inviteShared. Superseded by Workflow B (2x7L7Y1LUJJ9NhV0).",
+          "modifiable": false,
+          "reusable_components": "conversations.inviteShared (Slack Connect external invite) httpRequest pattern"
+        },
+        {
+          "id": "8jTHkSHGGaCSiJln",
+          "name": "Fathom → Notion Call Processing",
+          "active": true,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "webhook /d584dab4-df9d-4d51-944b-7459645cb767",
+          "services": [
+            "notion",
+            "slack",
+            "openai"
+          ],
+          "purpose": "Receives Fathom call webhooks, runs an OpenAI agent to analyze the call, upserts a Notion call page (search→update or create), and posts onboarding calls to Slack #onboarding-call-notes.",
+          "modifiable": false,
+          "reusable_components": "AI agent + structured output parser pattern for extracting structured fields from raw text; Notion search-then-upsert pattern"
+        },
+        {
+          "id": "FX7WHqAqhtcV4hdr",
+          "name": "Zoom Onboarding Call to Client Flowchart and Task Assignment",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "webhook /fathom-transcript (plus Figma file-update trigger)",
+          "services": [
+            "notion",
+            "openai",
+            "figma",
+            "gmail"
+          ],
+          "purpose": "Fathom transcript webhook → OpenAI agent extracts action items + diagram data → creates FigJam diagram via Figma API, creates Notion client page and action-item tasks, emails diagram via Gmail; separate Figma-update branch syncs changes to Notion and notifies team.",
+          "modifiable": false,
+          "reusable_components": "Structured-output agent extracting action items from transcripts; splitOut→per-item Notion task creation"
+        },
+        {
+          "id": "LsVRzEkpWfW912Qw",
+          "name": "Workflow B — GHL Onboarding Booked → Slack Channel (NEW)",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "NONE",
+          "services": [],
+          "purpose": "Empty shell — zero nodes in the dump; intended (per name) to create a Slack channel when a GHL onboarding call is booked, but nothing built.",
+          "modifiable": false,
+          "reusable_components": "none"
+        },
+        {
+          "id": "Nm6LaCzIkqG7Nx3K",
+          "name": "Onboarding Workflow",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "NONE (n8n form trigger)",
+          "services": [
+            "gmail",
+            "slack",
+            "openai",
+            "clickup",
+            "google drive"
+          ],
+          "purpose": "Client onboarding on form submit: sends welcome email (Gmail), creates a company Slack channel + posts, extracts tasks from an uploaded PDF via a GPT-4o-mini agent with structured output, creates ClickUp folder/list/tasks, and creates a Google Drive client folder.",
+          "modifiable": false,
+          "reusable_components": "LangChain agent + structured output parser for turning unstructured docs into task lists; PDF extractFromFile pattern — could parse prospect docs, but marginal for cold email."
+        },
+        {
+          "id": "U6PMw4v7vFFRDoUW",
+          "name": "5. Fathom Meeting Transcript Reporter",
+          "active": true,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "webhook /fathom-meeting (+ /fathom-action-complete for Slack interactivity)",
+          "services": [
+            "fathom (inbound)",
+            "google drive",
+            "slack"
+          ],
+          "purpose": "Fathom meeting webhook: resolves client, dedupes against Drive, creates transcript + summary Google Docs, posts meeting report to Slack with interactive action buttons whose callbacks update the Slack message; errors alert Slack.",
+          "modifiable": false,
+          "reusable_components": "Slack interactivity webhook + chat.update round-trip pattern; Drive duplicate-search dedupe before create"
+        },
+        {
+          "id": "YJIcdJIHijHjhbht",
+          "name": "4. Brand Book Generator",
+          "active": true,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "/brand-book-generator",
+          "services": [
+            "anthropic",
+            "google drive",
+            "slack",
+            "convertapi"
+          ],
+          "purpose": "Onboarding webhook with client assets → downloads/converts assets (ConvertAPI PDF/SVG→PNG), Claude analyzes brand, composes brand-book HTML → PDF, saves to client Google Drive folder, Slack notifies; error trigger to Slack.",
+          "modifiable": false,
+          "reusable_components": "Claude vision brand analysis + HTML→PDF via ConvertAPI; Drive folder find-or-create pattern; errorTrigger→Slack alerting."
+        },
+        {
+          "id": "Zxu0n17m8j3L7u5I",
+          "name": "Workflow B — PandaDoc Signed → Client Onboarding V2",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "/1b1a9d34-17f3-49ad-8630-303cb2dce45c (PandaDoc webhook)",
+          "services": [
+            "pandadoc (inbound)",
+            "gmail",
+            "slack",
+            "google drive"
+          ],
+          "purpose": "PandaDoc document.completed → sends welcome email, creates client Slack channel, invites client as guest, posts welcome message, creates client Drive folder with 4 subfolders, notifies #new-agreements.",
+          "modifiable": false,
+          "reusable_components": "Slack conversations.create/invite/users.lookupByEmail channel-provisioning pattern; Drive folder+subfolder scaffolding."
+        },
+        {
+          "id": "aa8bUwBHFAUlM3oz",
+          "name": "3. Client Onboarding: Trustpilot Competitor Watch",
+          "active": true,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "/web-scraper",
+          "services": [
+            "apify.com",
+            "anthropic",
+            "google drive",
+            "slack"
+          ],
+          "purpose": "GHL onboarding webhook with competitors → Apify run-sync scrapes Trustpilot, Google Reviews, Reddit; dedupes seen reviews, groups by competitor, Claude writes digest, saves summary doc to Google Drive, Slack-notifies; errorTrigger→Slack.",
+          "modifiable": false,
+          "reusable_components": "Apify run-sync-get-dataset-items invocation (3 actors, no polling needed); removeDuplicates already-seen filter; per-competitor grouping + Claude digest pattern usable for competitor-intel personalization in cold email."
+        },
+        {
+          "id": "cfRtWW5bHziZkAW2",
+          "name": "Client Onboarding - Slack Connect + Delegation Guide",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "NONE (n8n form trigger)",
+          "services": [
+            "slack"
+          ],
+          "purpose": "On form submit: creates a Slack channel, sends a Slack Connect invite to the client, posts a welcome message and threaded tool-guide messages.",
+          "modifiable": false,
+          "reusable_components": "Raw Slack API HTTP patterns (conversations.create, conversations.inviteShared, chat.postMessage with threading) — useful for client-facing channel automation, not core lead sourcing."
+        },
+        {
+          "id": "dt5MJFlNERwybyXP",
+          "name": "2. Create Notion Database",
+          "active": true,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "webhook /notion-database (POST); also errorTrigger → Slack",
+          "services": [
+            "notion",
+            "slack"
+          ],
+          "purpose": "Numbered onboarding step: on webhook, reads a Notion database and creates a page via the Notion API; error trigger posts failures to Slack.",
+          "modifiable": false,
+          "reusable_components": "errorTrigger → Slack failure-alert pattern; raw Notion pages POST. Nothing lead-sourcing specific."
+        },
+        {
+          "id": "efjCOJiZaczbmJUX",
+          "name": "Onboarding — Stage 2B: Unsigned Gate (webhook)",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "cron 0 9 * * * (despite 'webhook' in name)",
+          "services": [
+            "pandadoc",
+            "gmail",
+            "slack"
+          ],
+          "purpose": "Daily 9am sweep: lists PandaDoc docs in document.sent status, computes age, and for docs unsigned 2+ days sends a Gmail follow-up to HR and logs to Slack ops.",
+          "modifiable": false,
+          "reusable_components": "Scheduled poll → age-compute → conditional follow-up email pattern is structurally similar to a cold-email nudge loop, but implementation is PandaDoc-specific — effectively none."
+        },
+        {
+          "id": "n53aeRXo9ZEhbDeU",
+          "name": "Onboarding — Stage 1: Trigger & Parse",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "webhook /ghl-new-hire (POST)",
+          "services": [
+            "leadconnectorhq/GHL (inbound webhook)",
+            "pandadoc",
+            "slack"
+          ],
+          "purpose": "New-hire intake from GHL: validates/maps payload, creates a PandaDoc document from template, waits for processing, sends it for signature; Slack alerts on validation failure or doc-not-ready.",
+          "modifiable": false,
+          "reusable_components": "Create-then-poll-until-ready pattern (create → wait → status check → IF gate) reusable for any async API; otherwise PandaDoc/onboarding-specific."
+        },
+        {
+          "id": "nM69a2OHKraAlbe0",
+          "name": "Onboarding — Stage 2: Signed Gate (webhook)",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "webhook /pandadoc-completed (POST)",
+          "services": [
+            "pandadoc (inbound webhook)",
+            "gmail",
+            "slack",
+            "google admin directory",
+            "leadconnectorhq/GHL",
+            "n8n user API (placeholder URL)"
+          ],
+          "purpose": "On PandaDoc completion: verifies signature, sends Calendly link, Slack human-approval gate, then provisions the hire — creates Google Workspace user, emails credentials, invites to GHL and n8n, updates GHL contact status; logs rejects/ignored events to Slack.",
+          "modifiable": false,
+          "reusable_components": "Slack human-approval-gate pattern (Slack message → IF approved) reusable for campaign-launch approval; provisioning steps are onboarding-specific."
+        },
+        {
+          "id": "u4OkvNu3ZqxpIbuX",
+          "name": "PandaDoc → Slack: New Contract Drafted",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "webhook /pandadoc-doc-created",
+          "services": [
+            "pandadoc (inbound webhook)",
+            "slack"
+          ],
+          "purpose": "Receives PandaDoc document_created events, filters to draft/uploaded docs, builds a Slack Block payload and posts to #new-contracts via chat.postMessage, verifying the response.",
+          "modifiable": false,
+          "reusable_components": "Slack chat.postMessage via raw HTTP with response verification (Block Kit posting pattern)."
+        },
+        {
+          "id": "vfOxPah68kHn0T0a",
+          "name": "GHL Contract Tag — PandaDoc Draft Generator",
+          "active": false,
+          "system": "CLIENT_ONBOARDING",
+          "trigger": "webhook /ghl-contract-trigger",
+          "services": [
+            "leadconnectorhq/GHL (inbound)",
+            "pandadoc",
+            "slack"
+          ],
+          "purpose": "GHL contract tag fires webhook; validates contact data, checks PandaDoc for an existing draft (dedupe), creates a PandaDoc draft if none, then posts contract link to #new-contracts in Slack.",
+          "modifiable": false,
+          "reusable_components": "Find-existing-then-create dedupe pattern against an external API; Slack posting with verification."
+        }
+      ]
+    },
+    "CLIENT_BYLDA": {
+      "title": "CLIENT: BYLDA (Logan Fields / App Guys)",
+      "workflow_count": 7,
+      "workflows": [
+        {
+          "id": "80iIDmAKtBnCCUGz",
+          "name": "BYLDA n8n WF1 - Lead Intake Slack Ping",
+          "active": false,
+          "system": "CLIENT_BYLDA",
+          "trigger": "/bylda-lead-created (webhook)",
+          "services": [
+            "slack"
+          ],
+          "purpose": "BYLDA client lead-intake: normalizes GHL LEAD_CREATED webhook payload, responds 200, pings Slack.",
+          "modifiable": false,
+          "reusable_components": "none"
+        },
+        {
+          "id": "AmO3QaRxwBmHptzf",
+          "name": "BYLDA n8n WF7 - Build Pack Progress",
+          "active": true,
+          "system": "CLIENT_BYLDA",
+          "trigger": "webhook /bylda-lead-progress",
+          "services": [
+            "leadconnectorhq/GHL",
+            "slack"
+          ],
+          "purpose": "On lead-progress webhook, upserts GHL contact + custom fields, then composes/updates a 'Build Pack' progress note on the contact (get notes → update or create) and Slack-notifies conditionally.",
+          "modifiable": false,
+          "reusable_components": "GHL contacts/upsert HTTP pattern and note get→update-or-create idempotency pattern"
+        },
+        {
+          "id": "KYHGmsrax1QjsQuE",
+          "name": "BYLDA n8n WF2 - Prototype Engine",
+          "active": false,
+          "system": "CLIENT_BYLDA",
+          "trigger": "webhook /bylda-qualified-booked",
+          "services": [
+            "anthropic",
+            "supabase.co",
+            "hcti.io",
+            "leadconnectorhq/GHL",
+            "slack (incoming webhook)"
+          ],
+          "purpose": "On qualified-booked webhook: Claude generates an HTML wireframe, uploads it to Supabase storage, screenshots via hcti.io, writes prototype URLs to the GHL contact, waits until T-30m before the booked slot, then sends a pre-call SMS via GHL conversations. Guard branches respond 422/502 and Slack-alert on failure.",
+          "modifiable": false,
+          "reusable_components": "Anthropic /v1/messages HTTP-call pattern with output extraction code node; timed wait-until-offset-before-event pattern; Supabase storage upload via REST — useful for AI-personalized asset generation per lead."
+        },
+        {
+          "id": "QuZfRRgIrxgVlXWP",
+          "name": "BYLDA n8n WF6 - Meta Conversions API",
+          "active": false,
+          "system": "CLIENT_BYLDA",
+          "trigger": "webhook /bylda-capi-event",
+          "services": [
+            "facebook graph (Meta CAPI)"
+          ],
+          "purpose": "Webhook receives an event, normalizes, SHA-256 hashes user data in a code node, and POSTs it to Meta Conversions API (graph.facebook.com pixel events), then responds 200.",
+          "modifiable": false,
+          "reusable_components": "User-data hashing + CAPI payload builder code node — reusable for any Meta CAPI bridge, not cold email specifically."
+        },
+        {
+          "id": "VnoGpWeqRAB9nU7L",
+          "name": "BYLDA n8n WF4 - Build Pack PDF Generator",
+          "active": false,
+          "system": "CLIENT_BYLDA",
+          "trigger": "webhook /bylda-buildpack-pdf",
+          "services": [
+            "hcti.io",
+            "leadconnectorhq/GHL"
+          ],
+          "purpose": "Renders a Build Pack HTML template to an image/PDF via hcti.io and writes the asset URL onto the GHL contact custom field; responds 200/502 based on render success.",
+          "modifiable": false,
+          "reusable_components": "HTML-to-image render via hcti.io; GHL contact custom-field write pattern"
+        },
+        {
+          "id": "VqQrVZJ4VoBGyjiT",
+          "name": "BYLDA n8n WF3 - Branch Notifier",
+          "active": false,
+          "system": "CLIENT_BYLDA",
+          "trigger": "webhooks /bylda-lead-exploring and /bylda-lead-dq",
+          "services": [
+            "leadconnectorhq/GHL",
+            "slack (incoming webhook)"
+          ],
+          "purpose": "Two webhooks tag a lead as exploring or DQ, upsert the contact+tag into GHL, and ping Slack via incoming webhook.",
+          "modifiable": false,
+          "reusable_components": "GHL contacts/upsert with tagging pattern"
+        },
+        {
+          "id": "ZN6omtZkFjvUsLQ7",
+          "name": "BYLDA n8n WF5 - DQ Gift, The DIY Route",
+          "active": false,
+          "system": "CLIENT_BYLDA",
+          "trigger": "/bylda-dq-gift",
+          "services": [
+            "anthropic",
+            "hcti.io",
+            "leadconnectorhq/GHL",
+            "slack"
+          ],
+          "purpose": "For disqualified BYLDA leads: Claude writes a personalized 'DIY Route' gift as HTML, hcti.io renders it to an image, writes the result to the GHL contact record; Slack webhook alert + 502 on render failure.",
+          "modifiable": false,
+          "reusable_components": "Claude→HTML→hcti.io image-render pattern (could power personalized cold-email images); GHL contact field write via services.leadconnectorhq.com."
+        }
+      ]
+    },
+    "COST_LEDGER": {
+      "title": "CLIENT: COST LEDGER (GHL ↔ Sheets)",
+      "workflow_count": 4,
+      "workflows": [
+        {
+          "id": "EXamxKhW9peUouuO",
+          "name": "Cost Ledger — A — Jobs Sync (GHL to Sheets)",
+          "active": true,
+          "system": "COST_LEDGER",
+          "trigger": "webhook /ghl-jobs-sync",
+          "services": [
+            "leadconnectorhq/GHL",
+            "google sheets"
+          ],
+          "purpose": "GHL opportunity webhook → maps payload to a Jobs row → upserts into Google Sheets ledger.",
+          "modifiable": false,
+          "reusable_components": "webhook→map→Sheets upsert pattern"
+        },
+        {
+          "id": "HRDZZViZHucBjHR1",
+          "name": "Cost Ledger — C — On-demand Excel Export",
+          "active": true,
+          "system": "COST_LEDGER",
+          "trigger": "webhook /ledger-export",
+          "services": [
+            "google sheets"
+          ],
+          "purpose": "On webhook, reads Ledger + Jobs sheets, filters and totals in code, converts to XLSX, and responds to the webhook with the file.",
+          "modifiable": false,
+          "reusable_components": "Sheets→code totals→convertToFile XLSX→respondToWebhook file-download pattern (useful for exporting lead lists on demand)"
+        },
+        {
+          "id": "TsSptE6ULGpxsgJg",
+          "name": "Cost Ledger — C — Cost Intake (Form to Ledger)",
+          "active": false,
+          "system": "COST_LEDGER",
+          "trigger": "webhook /ledger-cost",
+          "services": [
+            "google sheets"
+          ],
+          "purpose": "Receives cost form submissions, maps to a ledger row, appends to the Cost Ledger Google Sheet.",
+          "modifiable": false,
+          "reusable_components": "none"
+        },
+        {
+          "id": "mmi69ErtebtgDUiN",
+          "name": "Cost Ledger — B — Cost Intake (Form to Ledger)",
+          "active": true,
+          "system": "COST_LEDGER",
+          "trigger": "webhook /ledger-cost (POST)",
+          "services": [
+            "google sheets"
+          ],
+          "purpose": "Receives a cost form submission, reads the Jobs sheet to map the cost to a job, and appends a row to the Ledger sheet.",
+          "modifiable": false,
+          "reusable_components": "none"
+        }
+      ]
+    },
+    "JARVIS_MISC": {
+      "title": "JARVIS / MISC INTERNAL OPS",
+      "workflow_count": 14,
+      "workflows": [
+        {
+          "id": "3qyTRxFWDYthPrHn",
+          "name": "Neal Autopilot — Selective (Client Channels)",
+          "active": true,
+          "system": "JARVIS_MISC",
+          "trigger": "/neal-autopilot (webhook, Slack events)",
+          "services": [
+            "slack",
+            "anthropic"
+          ],
+          "purpose": "Slack event listener: filters to client channels, classifies inbound messages with Claude, auto-replies as Neal when classified safe, otherwise DMs a draft to Neal for approval and sends on approval.",
+          "modifiable": true,
+          "reusable_components": "Claude classify-then-gate pattern (safe/unsafe routing) and Slack draft-approval loop — directly reusable for cold-email reply triage/drafting"
+        },
+        {
+          "id": "7LutbMORPmfu0nep",
+          "name": "Brain Dump to Notion Task Organizer",
+          "active": false,
+          "system": "JARVIS_MISC",
+          "trigger": "/brain-dump (webhook)",
+          "services": [
+            "openai",
+            "notion"
+          ],
+          "purpose": "Receives brain-dump text, uses a GPT LangChain agent with structured output parser to organize it into tasks, creates Notion database entries.",
+          "modifiable": true,
+          "reusable_components": "Structured-output-parser pattern for LLM→typed JSON; none cold-email-specific"
+        },
+        {
+          "id": "A0g5KMYYCxSNrgXW",
+          "name": "FlowOperations - Error Notifier",
+          "active": false,
+          "system": "JARVIS_MISC",
+          "trigger": "NONE (n8n Error Trigger)",
+          "services": [
+            "slack"
+          ],
+          "purpose": "Global n8n error trigger that posts workflow failures to Slack via chat.postMessage.",
+          "modifiable": true,
+          "reusable_components": "Error Trigger → Slack chat.postMessage alerting pattern, reusable as failure alerting for a cold-email engine"
+        },
+        {
+          "id": "Dwaj9g3r4XPKwphB",
+          "name": "X Auto Poster",
+          "active": false,
+          "system": "JARVIS_MISC",
+          "trigger": "NONE (Slack message trigger on channel C0AG731FPMF, Brutus token)",
+          "services": [
+            "slack",
+            "twitter/X"
+          ],
+          "purpose": "Posts any Slack message from channel C0AG731FPMF to X as a tweet.",
+          "modifiable": true,
+          "reusable_components": "Slack-channel-message-as-trigger pattern (could drive manual campaign commands), otherwise none"
+        },
+        {
+          "id": "NXJ92TP29LkWuowA",
+          "name": "Fathom to Notion Call Sync + Action Items",
+          "active": false,
+          "system": "JARVIS_MISC",
+          "trigger": "webhook /fathom-call-received",
+          "services": [
+            "notion"
+          ],
+          "purpose": "Fathom call webhook → parses summary/action items → creates a Notion call record, then splits action items into individual Notion task pages.",
+          "modifiable": true,
+          "reusable_components": "Webhook-payload parse + Notion databasePage create pattern; splitOut of nested action items into per-item records — reusable for logging positive replies/meetings booked from cold email into Notion."
+        },
+        {
+          "id": "PWLbRw3pfFqnXuK0",
+          "name": "🤖Email Agent",
+          "active": true,
+          "system": "JARVIS_MISC",
+          "trigger": "NONE (executeWorkflowTrigger — called by another workflow)",
+          "services": [
+            "gmail",
+            "openai"
+          ],
+          "purpose": "Sub-workflow LangChain agent (GPT-4o) with a full Gmail toolbelt: send, reply, draft, getAll, labels, mark unread — an email-operations agent invoked by a parent workflow (Jarvis-style).",
+          "modifiable": true,
+          "reusable_components": "Agent-with-Gmail-tools pattern for automated reply handling/drafting — could power positive-reply triage and draft responses for a cold-email inbox (though sending should stay in Smartlead)."
+        },
+        {
+          "id": "S1xs37O9JZMAX8ZI",
+          "name": "FlowOps Daily Diagnostic → #diagnostics",
+          "active": true,
+          "system": "JARVIS_MISC",
+          "trigger": "cron 0 15 * * * (10am EST) + webhook /flowops-diagnostic-now",
+          "services": [
+            "pandadoc",
+            "leadconnectorhq/GHL",
+            "make.com",
+            "n8n cloud",
+            "slack"
+          ],
+          "purpose": "Daily health check code node pings PandaDoc templates/webhooks, GHL location+workflows, Make scenarios/connections, and n8n itself, then posts a status Block Kit report to Slack #diagnostics and verifies the post.",
+          "modifiable": true,
+          "reusable_components": "Multi-service health-check pattern in a single code node; Slack chat.postMessage via raw HTTP with post-verification step; dual cron+manual-webhook trigger pattern"
+        },
+        {
+          "id": "VRBpRIg51CfTWiwX",
+          "name": "FlowOps Slack Video Approval",
+          "active": false,
+          "system": "JARVIS_MISC",
+          "trigger": "webhook /video-ready (+ /slack-callback)",
+          "services": [
+            "slack",
+            "youtube (placeholder)",
+            "tiktok (placeholder)",
+            "instagram/facebook graph (placeholder)",
+            "linkedin (placeholder)"
+          ],
+          "purpose": "Video-ready webhook posts a Slack approve/reject card; on approval routes to four social upload nodes that are explicitly placeholders (YOUR_IG_USER_ID etc.), on reject posts a reject message.",
+          "modifiable": true,
+          "reusable_components": "Slack approve/reject callback-webhook approval gate — reusable as a human-approval gate before auto-sending cold-email replies"
+        },
+        {
+          "id": "Vlq8LWWuHZN7Vaf8",
+          "name": "Zoom Transcript → Notion (Blocks) → Ready to Process",
+          "active": false,
+          "system": "JARVIS_MISC",
+          "trigger": "webhook /fathom/recording-completed",
+          "services": [
+            "notion",
+            "openai"
+          ],
+          "purpose": "Fathom recording-completed webhook: downloads transcript, chunks it into Notion blocks appended in batches, then an OpenAI-backed agent extracts structured meeting info formatted for Notion.",
+          "modifiable": true,
+          "reusable_components": "Notion block-batching append pattern (2000-char chunk workaround); structured-output LLM agent over long text"
+        },
+        {
+          "id": "W9iOf0nz1UWwe28z",
+          "name": "Brand Book Generator",
+          "active": false,
+          "system": "JARVIS_MISC",
+          "trigger": "webhook /brandbook-intake",
+          "services": [
+            "anthropic",
+            "google drive",
+            "slack",
+            "leadconnectorhq/GHL",
+            "custom render service"
+          ],
+          "purpose": "Brand intake webhook: two-stage Claude calls (strategy then design tokens), validates and composes a brand book, renders PDF via external render service, uploads to Drive, Slack human-approval Wait gate, then attaches note to GHL contact and notifies delivered/revision.",
+          "modifiable": true,
+          "reusable_components": "Two-stage chained Claude prompting with validation gate; Slack Wait-for-human approval before delivery"
+        },
+        {
+          "id": "Ymp1TxefF8daZDTu",
+          "name": "Client Ticket Submission",
+          "active": false,
+          "system": "JARVIS_MISC",
+          "trigger": "NONE (n8n form trigger)",
+          "services": [
+            "notion"
+          ],
+          "purpose": "n8n-hosted form submission creates a Notion database page (client ticket). Two nodes only.",
+          "modifiable": true,
+          "reusable_components": "none"
+        },
+        {
+          "id": "dB3TqhbKNDV2pTeL",
+          "name": "🤖Contact Agent",
+          "active": true,
+          "system": "JARVIS_MISC",
+          "trigger": "NONE (executeWorkflowTrigger — called by another workflow, JARVIS-style sub-agent)",
+          "services": [
+            "openai (gpt-4o via langchain)",
+            "airtable",
+            "google sheets"
+          ],
+          "purpose": "LangChain agent sub-workflow that gets/adds/updates contacts in Airtable and Google Sheets on behalf of a parent orchestrator agent.",
+          "modifiable": true,
+          "reusable_components": "Sub-workflow agent-with-tools pattern (executeWorkflowTrigger + langchain agent + Airtable/Sheets tool nodes) could serve as a CRM-write layer, but not lead-sourcing specific."
+        },
+        {
+          "id": "gIg2J8fa0SP0pggy",
+          "name": "🤖Calendar Agent",
+          "active": true,
+          "system": "JARVIS_MISC",
+          "trigger": "NONE (executeWorkflowTrigger sub-workflow)",
+          "services": [
+            "openai (gpt-4o via langchain)",
+            "google calendar"
+          ],
+          "purpose": "LangChain agent sub-workflow exposing Google Calendar tools (create/get/update/delete events, with attendees) to a parent JARVIS-style orchestrator.",
+          "modifiable": true,
+          "reusable_components": "none"
+        },
+        {
+          "id": "otWfDhWuIoPbmGtQ",
+          "name": "JARVIS",
+          "active": true,
+          "system": "JARVIS_MISC",
+          "trigger": "webhook /jarvis-n8n",
+          "services": [
+            "openai",
+            "tavily",
+            "slack (via sub-workflows)"
+          ],
+          "purpose": "LangChain agent (GPT-4o + buffer memory) behind a webhook, routing to Email/Contact/Content Creator/Calendar tool sub-workflows plus Tavily search and a calculator; a personal assistant hub.",
+          "modifiable": true,
+          "reusable_components": "Agent-with-tool-workflows pattern and webhook respond node; not directly reusable for a lead engine."
+        }
+      ]
+    },
+    "OTHER": {
+      "title": "OTHER (client creative, stubs, one-offs)",
+      "workflow_count": 22,
+      "workflows": [
+        {
+          "id": "3kvsQBqzMIjRYXSZ",
+          "name": "My workflow 3",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "/ba51f593-8e26-41d2-9540-6b0f77feb892 (webhook)",
+          "services": [],
+          "purpose": "Empty stub — single webhook node, no downstream logic.",
+          "modifiable": true,
+          "reusable_components": "none"
+        },
+        {
+          "id": "7ovuU3lbuyMjTvGJ",
+          "name": "Olive Branch — Manual Image Gen (Lovable Webhook)",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "/olive-branch-image-request (webhook)",
+          "services": [
+            "shopify",
+            "openai",
+            "slack"
+          ],
+          "purpose": "Client (Laura/Olive Branch) image pipeline: form webhook → Shopify product fetch → GPT-4o creative brief → gpt-image-1 generation loop → Slack post. Client-owned.",
+          "modifiable": false,
+          "reusable_components": "none"
+        },
+        {
+          "id": "ASY6Bq7Ml4CwCYkl",
+          "name": "HR-focused automation pipeline with AI",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "NONE (n8n form trigger)",
+          "services": [
+            "openai",
+            "google sheets",
+            "google drive"
+          ],
+          "purpose": "Template-style CV screening pipeline: form upload → extract text from CV → OpenAI extracts qualifications/personal data + summarization → writes evaluation to Google Sheets and uploads CV to Drive.",
+          "modifiable": true,
+          "reusable_components": "LLM informationExtractor + structured output → Google Sheets row-write pattern (usable for lead enrichment-to-sheet)"
+        },
+        {
+          "id": "Dmqw1pmqlOsRg5QS",
+          "name": "Olive Branch — Manual Image Gen (Lovable Webhook) V2",
+          "active": true,
+          "system": "OTHER",
+          "trigger": "webhook /cf3a46a4-7ffb-4bed-a99a-0d1a9b66d8c8",
+          "services": [
+            "shopify",
+            "openai",
+            "slack"
+          ],
+          "purpose": "Lovable form webhook → fetch Shopify product, GPT creative-director brief, generate ad image via OpenAI images/edits, upload result to Slack via external-upload 3-step flow.",
+          "modifiable": true,
+          "reusable_components": "Slack files.getUploadURLExternal → upload → completeUploadExternal binary-upload pattern"
+        },
+        {
+          "id": "GV8Kbm24UVOXdDLV",
+          "name": "Olive Branch — Manual AI Image Gen (Full AI + Pixian ref)",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "webhook /olive-branch-image-request",
+          "services": [
+            "shopify",
+            "openai",
+            "pixian.ai",
+            "slack"
+          ],
+          "purpose": "Lovable form webhook → Shopify product image → Pixian background removal → GPT creative brief → OpenAI images/edits full-AI ad → logo composite → Slack external-upload share; fans out N versions in a batch loop.",
+          "modifiable": true,
+          "reusable_components": "Slack external-upload pattern; fan-out-N-versions splitInBatches loop"
+        },
+        {
+          "id": "Gf5yzIWqE0JPUDLX",
+          "name": "My workflow 2",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "cron (empty default schedule trigger, no rule configured)",
+          "services": [],
+          "purpose": "Empty stub: a single schedule trigger with no other nodes. Does nothing.",
+          "modifiable": true,
+          "reusable_components": "none"
+        },
+        {
+          "id": "IY5NuPzdt9RCp5cq",
+          "name": "ZZ - Credential Setup (delete after use)",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "NONE",
+          "services": [],
+          "purpose": "Manual-trigger stub (Manual Trigger + NoOp only) used to attach/test credentials; self-labeled delete-after-use.",
+          "modifiable": true,
+          "reusable_components": "none"
+        },
+        {
+          "id": "OZo0L1VBWpgQhWd8",
+          "name": "My workflow 4",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "NONE",
+          "services": [],
+          "purpose": "Empty — zero nodes in the dump.",
+          "modifiable": true,
+          "reusable_components": "none"
+        },
+        {
+          "id": "Ow3moIAHQAzhXJEI",
+          "name": "Shopify Product Image - Auto BG Detection (Pixian.ai)",
+          "active": true,
+          "system": "OTHER",
+          "trigger": "cron 0 8 * * * (daily 8am MST)",
+          "services": [
+            "shopify",
+            "openai (images/edits, responses, GPT vision)",
+            "pixian.ai",
+            "slack"
+          ],
+          "purpose": "Daily Olive Branch ad generator: pulls Shopify products, picks 5, GPT-5.5 creative-director brief, GPT-Vision classifies whether background removal is needed, removes BG via Pixian.ai, composites/generates final ads via OpenAI image edits, uploads results to Slack (olive-branch channel) with error-trigger Slack alerts. Client (Laura/Olive Branch) creative pipeline.",
+          "modifiable": false,
+          "reusable_components": "Slack external file-upload 3-step pattern (getUploadURLExternal → POST binary → completeUploadExternal); errorTrigger → Slack alert pattern. Not lead-gen relevant otherwise."
+        },
+        {
+          "id": "RGxqcGU9MSI5I3MI",
+          "name": "Daily Shopify Ad Generator (LAURA)",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "cron 0 7 * * * (daily 7am MST)",
+          "services": [
+            "shopify",
+            "openai (gpt-4o, gpt-image-1, images/edits)",
+            "slack",
+            "microsoft onedrive"
+          ],
+          "purpose": "Earlier version of the Laura/Olive Branch daily ad pipeline: pick 5 Shopify products, GPT-4o writes creative brief, gpt-image-1 generates scene, composites logo, uploads to Slack and OneDrive. Client work.",
+          "modifiable": false,
+          "reusable_components": "Slack external file-upload 3-step pattern; otherwise none for lead gen."
+        },
+        {
+          "id": "Reyp6S8V65JFxD18",
+          "name": "Daily Shopify Ad Generator V3 - Without Logo",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "cron 0 8 * * * (daily 8am MST)",
+          "services": [
+            "shopify",
+            "openai (GPT-5.5 responses, images/edits)",
+            "slack"
+          ],
+          "purpose": "V3 of the Laura/Olive Branch daily ad pipeline without logo compositing: 5 products, GPT-5.5 brief, OpenAI edits for BG removal + final ad, Slack upload to fmg-graphics with error-trigger alerting. Client work.",
+          "modifiable": false,
+          "reusable_components": "errorTrigger → Slack alert and Slack file-upload patterns only."
+        },
+        {
+          "id": "SxKGrvHWbxiFeoR4",
+          "name": "Slack → X Auto-Poster",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "Slack trigger (new message in #final-social-media-posts)",
+          "services": [
+            "slack",
+            "twitter/x"
+          ],
+          "purpose": "Watches #final-social-media-posts, parses X post text from the Slack message via code node, posts to X/Twitter.",
+          "modifiable": true,
+          "reusable_components": "Slack-channel-as-approval-queue trigger pattern; none directly for lead sourcing"
+        },
+        {
+          "id": "TCNZWVDmhjsSz1uk",
+          "name": "ZZ - Anthropic Credential Setup (delete after use)",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "NONE (manual trigger)",
+          "services": [
+            "httpbin.org"
+          ],
+          "purpose": "One-off scaffold to register an Anthropic credential in n8n (HTTP node points at httpbin.org placeholder). Marked delete-after-use.",
+          "modifiable": true,
+          "reusable_components": "none"
+        },
+        {
+          "id": "XemFdZMTT96hePEX",
+          "name": "Daily Shopify Ad Generator V3",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "0 7 * * *",
+          "services": [
+            "shopify",
+            "openai",
+            "slack",
+            "google sheets"
+          ],
+          "purpose": "Daily picks 5 Shopify products, removes background via OpenAI image edit, GPT-4o writes creative brief, generates final ad image, composites/stamps logo, uploads final+original to Slack, logs to Google Sheets. Client (Laura/Olive Branch) creative pipeline.",
+          "modifiable": false,
+          "reusable_components": "Slack external file-upload 3-step pattern (getUploadURLExternal → upload → completeUploadExternal); Google Sheets dedupe/log pattern. Not lead-gen relevant otherwise."
+        },
+        {
+          "id": "bWlQ2T8PAttaSIpL",
+          "name": "Daily Shopify Ad Generator (LAURA)",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "daily at 07:00 (scheduleTrigger)",
+          "services": [
+            "shopify",
+            "anthropic",
+            "openai",
+            "onedrive",
+            "microsoft teams"
+          ],
+          "purpose": "V1 of Laura/Olive Branch ad generator: Shopify products → Claude ad strategy → OpenAI image gen → OneDrive upload → Teams approval message. Superseded by V2/V3, client-owned.",
+          "modifiable": false,
+          "reusable_components": "none"
+        },
+        {
+          "id": "bibamR9yfIoiN0p3",
+          "name": "Daily Shopify Ad Generator V2",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "0 8 * * *",
+          "services": [
+            "shopify",
+            "openai",
+            "slack",
+            "google sheets"
+          ],
+          "purpose": "V2 of the Laura/Olive Branch ad pipeline: 5 Shopify products daily, OpenAI background removal + GPT-4o brief + image-edit final ad, logo stamping via editImage, Slack file upload of final+original, Sheets dedupe log; errorTrigger→Slack. Client work, superseded by V3.",
+          "modifiable": false,
+          "reusable_components": "Slack 3-step external file-upload pattern; errorTrigger→Slack. Not lead-gen relevant otherwise."
+        },
+        {
+          "id": "d5MaXZjyuMHU84xQ",
+          "name": "Olive Branch Daily Creative (v3.4 - faithful product)",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "cron 0 7 * * *",
+          "services": [
+            "shopify",
+            "openai (images/edits, chat/completions, images/generations)",
+            "slack (external file upload)"
+          ],
+          "purpose": "Daily Olive Branch client creative pipeline: pulls Shopify products, removes background via OpenAI image edit, GPT-4o writes a creative brief, generates final ad image, composites logo/product with editImage nodes, uploads to Slack.",
+          "modifiable": false,
+          "reusable_components": "Slack external file-upload 3-step pattern (getUploadURLExternal → upload → completeUploadExternal); splitInBatches per-item loop. Otherwise creative-specific — none for lead sourcing."
+        },
+        {
+          "id": "dsIRoZ7IbfF6Ylxa",
+          "name": "PandaDoc → Slack: New Contract Drafted",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "webhook /pandadoc-doc-created (POST)",
+          "services": [
+            "pandadoc (inbound webhook)",
+            "slack"
+          ],
+          "purpose": "Receives PandaDoc document.created events, filters to draft/uploaded status, posts a formatted Block Kit message to #new-contracts via chat.postMessage and verifies the Slack response.",
+          "modifiable": true,
+          "reusable_components": "Webhook event parse → filter → Slack Block Kit post with response verification; generic notification tail."
+        },
+        {
+          "id": "kRd8vrBzLtvRdIVU",
+          "name": "My workflow",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "NONE",
+          "services": [],
+          "purpose": "Completely empty workflow — zero nodes. Safe-to-delete placeholder.",
+          "modifiable": true,
+          "reusable_components": "none"
+        },
+        {
+          "id": "oUDjAxVPOQ31Bgdv",
+          "name": "Slack to X Auto-Poster",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "NONE (Slack trigger: new post in final-social-media-posts)",
+          "services": [
+            "slack",
+            "twitter/X"
+          ],
+          "purpose": "Listens for new messages in the final-social-media-posts Slack channel, parses X post text out of the message via a code node, and posts to X/Twitter.",
+          "modifiable": true,
+          "reusable_components": "Slack-trigger-to-parse-to-post pattern; none specific to cold email."
+        },
+        {
+          "id": "uGsGEAla4W4sLhTq",
+          "name": "FlowOps Lead Nurture Engine",
+          "active": true,
+          "system": "OTHER",
+          "trigger": "webhook /flowops-lead-nurture",
+          "services": [
+            "leadconnectorhq/GHL",
+            "anthropic"
+          ],
+          "purpose": "GHL form opt-in triggers an AI SMS nurture sequence: Claude generates an opener sent via GHL conversations API, then wait 30min/24h/48h with reply checks (conversations/search); each no-reply branch generates and sends a Claude follow-up, ending in a soft close.",
+          "modifiable": true,
+          "reusable_components": "Reply-check gating pattern (poll GHL conversations, IF no-reply then follow up), Claude message-generation nodes, GHL send-message API calls — reusable as the reply-handling/nurture arm of a lead engine."
+        },
+        {
+          "id": "yHwQ4gTTSMFOrjpE",
+          "name": "BoldSign 403 isolation test",
+          "active": false,
+          "system": "OTHER",
+          "trigger": "webhook /endurance-os (plus manual chain)",
+          "services": [
+            "boldsign",
+            "w3.org (test PDF)"
+          ],
+          "purpose": "Debug scaffold: fetches a dummy PDF, attempts BoldSign document send/properties/list calls to isolate a 403 error; also has an /endurance-os webhook node.",
+          "modifiable": true,
+          "reusable_components": "none"
+        }
+      ]
+    }
+  }
+}
