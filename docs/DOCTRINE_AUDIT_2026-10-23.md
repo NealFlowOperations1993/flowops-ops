@@ -26,6 +26,23 @@ Measured against that, the engine is **strong in the middle and weak at both end
   back upstream, so the optimization loops (21) are tuning subject lines on open rate — the exact
   "vanity opens" signal the doctrine forbids, and which our own data shows is ~70% machines.
 
+### Update 2026-10-27 (from n8n execution history and Slack `#1-new-lead`)
+
+- **Positive replies, all time: 2 of 6,173 sends (0.03%).** Andrew Hardison (Aug 27, "Sure, I'd be
+  interested in seeing it.") and Ben at Codex Construction (Sep 19, "Ballpark?"). Neither reply card has a
+  thread reply, and the Oct 21 to-do list still says "answer Andrew + Ben". **Both appear unanswered.**
+  Andrew's suggested reply contained an unfilled `[tool_url]` placeholder.
+- Ben's reply was classified Info Request (72%), which is below the 0.75 Call Push threshold, so no
+  auto-reply was sent. The suggested reply did not answer his question.
+- **Since Sep 28: 20 reply events, 0 human.** 19 are marketing newsletters from aetrex.com (a footwear
+  brand the Deck Builders campaign emailed; a stage 03/04 relevance failure), and 1 is a stale out-of-office.
+  Each one still runs the Claude classifier and posts a Slack card. Fix: block aetrex.com.
+- One more possible human reply (LW Landscaping, "Stop", Sep 14) is not in the guide's count of 7.
+- The daily briefing reports "27 replies, 1.08%" (bots included) and bounce 4.25%; the guide reports
+  bounce 1.7–2.6%. One of them is wrong.
+- n8n keeps execution history back to Sep 28 only. Reply records older than that live in Smartlead and
+  the `fo-replies` dataset.
+
 Status key: ✅ meets the stage's gates · ◐ partial · ⚠ gate actively failing · ✗ not built
 
 ## Stage-by-stage
