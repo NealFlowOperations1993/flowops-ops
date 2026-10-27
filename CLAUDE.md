@@ -11,7 +11,8 @@ set -a; source ~/.config/n8n-creds/flowops-core.env; set +a
 ```
 
 Every script reads credentials from the environment: `SMARTLEAD_API_KEY`, `ANTHROPIC_API_KEY`,
-`OPENROUTER_API_KEY`, `APIFY_TOKEN`. Without this they raise `KeyError` — intended, so a stale
+`OPENROUTER_API_KEY`, `APIFY_TOKEN`, and `SUPABASE_SERVICE_KEY` (used by `bulk_import.py` and
+`core/signal_enricher.py`). Without this they raise `KeyError` — intended, so a stale
 key is never used silently. **Never hardcode a key**; 29 were removed from source on 2026-10-20.
 
 ## Current state (2026-10-23)
