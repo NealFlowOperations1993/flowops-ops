@@ -20,6 +20,7 @@ Niches available:
 import argparse
 import csv
 import json
+import os
 import sys
 import time
 import urllib.error
@@ -28,7 +29,7 @@ from pathlib import Path
 
 WEBHOOK = "https://exaltisgroup.app.n8n.cloud/webhook/apify-lead-pipeline"
 SUPABASE_URL = "https://uuhnhybmdsyzppiuhlvk.supabase.co"
-SUPABASE_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1aG5oeWJtZHN5enBwaXVobHZrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Njk5MjMwMiwiZXhwIjoyMDkyNTY4MzAyfQ.s-2IzGzAR0p4snuwP2PQacmT6C38pJhpT_MpqG_sJ2U"
+SUPABASE_JWT = os.environ["SUPABASE_SERVICE_KEY"]
 UA = "Mozilla/5.0"
 
 VALID_NICHES = {

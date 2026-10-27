@@ -26,7 +26,7 @@ from datetime import datetime, timedelta, timezone
 
 APIFY_TOKEN = os.environ["APIFY_TOKEN"]
 SUPABASE_URL = "https://uuhnhybmdsyzppiuhlvk.supabase.co"
-SUPABASE_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1aG5oeWJtZHN5enBwaXVobHZrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Njk5MjMwMiwiZXhwIjoyMDkyNTY4MzAyfQ.s-2IzGzAR0p4snuwP2PQacmT6C38pJhpT_MpqG_sJ2U"
+SUPABASE_JWT = os.environ["SUPABASE_SERVICE_KEY"]
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15"
 
 CACHE_TTL_DAYS = 7
