@@ -10,7 +10,7 @@ These are drafts. Neal approves or edits before anything sends.
 
 **Merge fields.** `{{first_name}}` (fallback "there"), `{{company_name}}`, `{{tool_url}}`, `[BOOKING_LINK]`.
 
-**Footer on every email:** sender name, FlowOperations, postal address, and `Not for you? Reply "stop" and I won't email again.`
+**Footer on every email:** sender name, FlowOperations, 293 Cardiff Dr., Morganville, NJ 07751, and `Not for you? Reply "stop" and I won't email again.`
 
 **Sequence:** day 0, day 3 and day 7, in the same thread.
 
