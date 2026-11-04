@@ -1,160 +1,120 @@
-# Wave 1 cold email copy: Deck + Hardscape (Nov 4, 2026)
+# Wave 1 cold email copy, v2 (more polarizing): Deck + Hardscape (Nov 4, 2026)
 
 These are drafts. Neal approves or edits before anything sends.
 
-**Stance.** Diagnose, say the uncomfortable thing, prescribe the call. One polarizing line per email. Truth only: no invented stats, no claims about the prospect we can't verify, no criticism of their business.
+**Stance.** Diagnose, say the uncomfortable thing, make the tool the obvious fix, prescribe the call.
 
-**Offer.** A free tool already built for their business, plus a 20-minute call.
+**Truth rules:**
+- Every review number and quote is real, from our VOC pull (~500 deck reviews, ~250 hardscape reviews).
+- No claims about the prospect's own business, no invented stats, no insults.
 
-**Merge fields:**
-- `{{first_name}}`: set the fallback in Smartlead to "there".
-- `{{company_name}}`
-- `{{tool_url}}`: from the Tool Studio CSV import. Variant A goes to the estimator, variant B to the bid decoder.
-- `[BOOKING_LINK]`: Neal to supply.
+**Merge fields.** `{{first_name}}` (fallback "there"), `{{company_name}}`, `{{tool_url}}`, `[BOOKING_LINK]`.
 
-**Sign-off.** Must match the sending inbox's name.
+**Footer on every email:** sender name, FlowOperations, postal address, and `Not for you? Reply "stop" and I won't email again.`
 
-**Footer on every email:**
-```
-[SENDER NAME]
-FlowOperations
-[POSTAL ADDRESS]
-Not for you? Reply "stop" and I won't email again.
-```
-
-**Sequence:** Step 1 on day 0, step 2 on day 3 (same thread), step 3 on day 7 (same thread).
+**Sequence:** day 0, day 3 and day 7, in the same thread.
 
 ---
 
 ## DECK BUILDERS
 
-### Variant A: Deck Cost Estimator (`deck-price-range`)
-
-**VOC tie-in:**
-- Top deck pains (~9 reviews each): "Estimate was over 15k higher than the other 2 I received" and "I never received a response" after the estimate visit.
-- Top win: "Estimate was clear and reasonable compared with others."
-
-**Step 1. Subject:** `price before the 7pm visit`
+### A: Deck Cost Estimator. Subject: `the quote you never sent`
 
 > Hey {{first_name}},
 >
-> Running a free estimate at 7pm for someone who's getting 3 quotes is the most expensive thing a deck builder does, and it never shows up on an invoice.
+> We read nearly 500 reviews of deck builders. The complaint that kept coming up wasn't the work. It was: "he measured, said he'd send renderings… I never received a response."
 >
-> So I built {{company_name}} a deck price estimator. Homeowners pick size, material and railing and see a real range before you ever drive out:
+> That homeowner doesn't wait. They go with whoever gives them a number first.
+>
+> So I built {{company_name}} a deck price estimator. A homeowner gets a real range in under a minute, at 10pm, while you're on a job site:
 > {{tool_url}}
 >
-> It's yours, free. If you want to see how to put it to work, grab 20 min: [BOOKING_LINK]
->
-> [SENDER NAME]
+> It's yours, free. 20 min and I'll show you how to put it to work: [BOOKING_LINK]
 
-### Variant B: Deck Bid Decoder (`deck-bid-decoder`)
-
-**VOC tie-in:**
-- Pain: price shock against other bids, and price raised after the deposit.
-- Win: "we appreciated the break out of all the costs involved so there were no surprises."
-
-**Step 1. Subject:** `the cheaper bid`
+### B: Deck Bid Decoder. Subject: `losing to the cheaper bid`
 
 > Hey {{first_name}},
 >
-> You know what the cheaper deck bid usually leaves out: footings, ledger flashing, the permit, tear-out. The homeowner doesn't.
+> You don't lose decks to better builders. You lose them to cheaper bids that leave out footings, ledger flashing, the permit and tear-out, and the homeowner can't tell the difference.
 >
-> So I built {{company_name}} a bid decoder. A homeowner checks what each quote actually includes and sees why yours costs what it does:
+> So they take the lower number, and you lose a job you'd have done right.
+>
+> I built {{company_name}} a bid decoder. Homeowners check what every quote actually includes and see exactly why yours costs more, before you're even in the room:
 > {{tool_url}}
 >
-> It's yours, free. If you want to see how to put it to work, grab 20 min: [BOOKING_LINK]
+> It's yours, free. 20 min and I'll show you how to put it to work: [BOOKING_LINK]
+
+### Day 3, same thread (both variants)
+
+> {{first_name}}, honest question: where are most of your jobs coming from right now, referrals, Angi, word of mouth?
 >
-> [SENDER NAME]
-
-### Steps 2 and 3 (deck, both variants)
-
-**Step 2, day 3, same thread** (spine Q2, polarize on referrals):
-
-> {{first_name}}, quick one: where are most of your jobs coming from right now, referrals, Angi, word of mouth?
+> Because referrals are great until February. Then the phone goes quiet, the crew sits, and you can't turn referrals up. Angi sells the same homeowner to 4 other guys, and you're paying to be in a bidding war.
 >
-> Asking because referrals are great until February. Then the phone goes quiet and the crew sits, and you can't turn referrals up.
->
-> Your page is still live: {{tool_url}}
+> The page works every night whether the phone rings or not: {{tool_url}}
 
-**Step 3, day 7, same thread** (take-away):
+### Day 7, same thread (take-away)
 
 > Last one from me.
 >
-> Honestly, if you're booked out and happy at the size you are, this isn't for you and I'll leave it there.
+> If you're booked out and fine running estimates at 7pm for people collecting 3 quotes, this isn't for you and I'll leave it there.
 >
-> If you'd rather have homeowners show up already knowing the price, the page is yours: {{tool_url}}
-> 20 min with me: [BOOKING_LINK]
+> If you'd rather have homeowners show up already knowing the price, it's built and waiting: {{tool_url}}
+> 20 min: [BOOKING_LINK]
 
 ---
 
 ## HARDSCAPING
 
-### Variant A: Patio & Paver Estimator (`hardscape-patio-estimator`)
-
-**VOC tie-in:**
-- Top hardscape pain (~9): price surprises, and "not knowing the fair price."
-- Wins: fair price (~13), and reliable and responsive (~30).
-
-**Step 1. Subject:** `a number before the visit`
+### A: Patio & Paver Estimator. Subject: `"just give me a number"`
 
 > Hey {{first_name}},
 >
-> Most homeowners asking about a patio want one thing first: a number. When they can't get one, they call the next guy on the list.
+> We read about 250 reviews of hardscape and patio companies. The pain that kept coming up was price: homeowners who felt overcharged because nobody gave them a straight number. One wrote: "I was floored to learn I had been paying two to three times the market rate."
 >
-> So I built {{company_name}} a patio and paver estimator. They pick the project, material and size and see a real range before you drive out:
+> A homeowner who can't get a number from you assumes the worst, or calls someone who'll give one.
+>
+> I built {{company_name}} a patio and paver estimator. They see a real range in under a minute, before you drive out:
 > {{tool_url}}
 >
-> It's yours, free. If you want to see how to put it to work, grab 20 min: [BOOKING_LINK]
->
-> [SENDER NAME]
+> It's yours, free. 20 min and I'll show you how to put it to work: [BOOKING_LINK]
 
-### Variant B: Hardscape Bid Decoder (`hardscape-bid-decoder`)
-
-**VOC tie-in:**
-- Pain: "I was floored to learn I had been paying two to three times the market rate", plus overcharging and hidden fees.
-- Win: "Price was very reasonable."
-
-**Step 1. Subject:** `what the cheap patio skips`
+### B: Hardscape Bid Decoder. Subject: `the patio that sinks`
 
 > Hey {{first_name}},
 >
-> Base depth, compaction, edge restraint and drainage are where a cheap patio cuts corners, and the homeowner can't see any of it until it sinks.
+> Every cheap patio cuts the same corners: thin base, no compaction, no edge restraint, no drainage. Nobody sees it until it sinks, and then the homeowner blames every hardscaper in the county.
 >
-> So I built {{company_name}} a bid decoder. A homeowner checks what each quote actually includes and sees why yours costs what it does:
+> Meanwhile you lose the bid for doing it right.
+>
+> I built {{company_name}} a bid decoder. Homeowners check what each quote actually includes and see why yours costs what it does, before they sign with the cheap guy:
 > {{tool_url}}
 >
-> It's yours, free. If you want to see how to put it to work, grab 20 min: [BOOKING_LINK]
+> It's yours, free. 20 min and I'll show you how to put it to work: [BOOKING_LINK]
+
+### Day 3, same thread (both variants)
+
+> {{first_name}}, honest question: where are most of your jobs coming from right now, referrals, Angi, word of mouth?
 >
-> [SENDER NAME]
-
-### Steps 2 and 3 (hardscape, both variants)
-
-**Step 2, day 3, same thread** (spine Q2, polarize on slow season):
-
-> {{first_name}}, quick one: where are most of your jobs coming from right now, referrals, Angi, word of mouth?
+> Because slow months aren't weather. They're a pipeline you didn't fill in the fall, and it's November. The homeowners planning spring patios are pricing them out right now.
 >
-> Asking because slow months aren't weather. They're a pipeline you didn't fill in the fall, and it's November.
->
-> Your page is still live: {{tool_url}}
+> The page works every night whether the phone rings or not: {{tool_url}}
 
-**Step 3, day 7, same thread** (take-away):
+### Day 7, same thread (take-away)
 
 > Last one from me.
 >
-> Honestly, if you're booked out and happy at the size you are, this isn't for you and I'll leave it there.
+> If you're booked out and fine being the highest-paid laborer in your company by day and the sales department at night, this isn't for you and I'll leave it there.
 >
-> If you'd rather have homeowners show up already knowing the price, the page is yours: {{tool_url}}
-> 20 min with me: [BOOKING_LINK]
+> If you'd rather have homeowners show up already knowing the price, it's built and waiting: {{tool_url}}
+> 20 min: [BOOKING_LINK]
 
 ---
 
-## Pre-send checks (CLAUDE.md rules)
+## Fact-check notes (keep true)
 
-- **Words:** step 1 runs 70–80 words. Plain text, no images.
-- **Subjects:** lowercase and literal. No "Re:", no fake urgency.
-- **Claims:**
-  - No claims about the prospect's ads, reviews or website.
-  - No monthly-payment promise.
-  - No invented numbers. "3 quotes" is the homeowner behavior the VOC shows, not a statistic about the prospect.
-- **Links:** 2 links in step 1 (tool + booking), as Neal decided. Click tracking stays OFF. Full URLs, no shorteners.
-- **Merge fields:** every `{{tool_url}}` must resolve. Send a test to a seed inbox for each variant before launch.
+- **"Nearly 500" / "about 250" reviews:** we pulled 497 deck and 254 hardscape Google reviews.
+- **Deck quote** ("I never received a response"): verbatim from VOC deck pain #2 (~9 reviews). Price shock was tied at ~9.
+- **Hardscape quote** ("two to three times the market rate"): verbatim from VOC. Hardscape data is partly polluted, but this quote is from a landscaping/hardscape customer.
+- **"Angi sells the same homeowner to 4 other guys":** this is the line from Neal's setter script. Keep it only if Neal is comfortable standing behind "4". The safer version is "to several other contractors".
+- **"Homeowners planning spring patios are pricing them out right now":** a reasonable seasonal claim, not a statistic. Cut it if Neal wants zero inference.
+- **Bid-decoder items** match the checklist keys in Grokbot's tools (footings, ledger, permit, tear-out; base, compaction, edge, drainage).
