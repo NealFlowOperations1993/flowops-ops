@@ -29,7 +29,7 @@ These are drafts. Neal approves or edits before anything sends.
 > So I built {{company_name}} a deck price estimator. A homeowner gets a real range in under a minute, at 10pm, while you're on a job site:
 > {{tool_url}}
 >
-> It's yours, free. 20 min and I'll show you how to put it to work: [BOOKING_LINK]
+> It's yours, free. 20 min with Neal, our founder, and he'll show you how to put it to work: [BOOKING_LINK]
 
 ### B: Deck Bid Decoder. Subject: `losing to the cheaper bid`
 
@@ -42,13 +42,13 @@ These are drafts. Neal approves or edits before anything sends.
 > I built {{company_name}} a bid decoder. Homeowners check what every quote actually includes and see exactly why yours costs more, before you're even in the room:
 > {{tool_url}}
 >
-> It's yours, free. 20 min and I'll show you how to put it to work: [BOOKING_LINK]
+> It's yours, free. 20 min with Neal, our founder, and he'll show you how to put it to work: [BOOKING_LINK]
 
 ### Day 3, same thread (both variants)
 
 > {{first_name}}, honest question: where are most of your jobs coming from right now, referrals, Angi, word of mouth?
 >
-> Because referrals are great until February. Then the phone goes quiet, the crew sits, and you can't turn referrals up. Angi sells the same homeowner to 4 other guys, and you're paying to be in a bidding war.
+> Because referrals are great until February. Then the phone goes quiet, the crew sits, and you can't turn referrals up. Angi sells the same homeowner to several other contractors, and you're paying to be in a bidding war.
 >
 > The page works every night whether the phone rings or not: {{tool_url}}
 
@@ -59,7 +59,7 @@ These are drafts. Neal approves or edits before anything sends.
 > If you're booked out and fine running estimates at 7pm for people collecting 3 quotes, this isn't for you and I'll leave it there.
 >
 > If you'd rather have homeowners show up already knowing the price, it's built and waiting: {{tool_url}}
-> 20 min: [BOOKING_LINK]
+> 20 min with Neal: [BOOKING_LINK]
 
 ---
 
@@ -76,7 +76,7 @@ These are drafts. Neal approves or edits before anything sends.
 > I built {{company_name}} a patio and paver estimator. They see a real range in under a minute, before you drive out:
 > {{tool_url}}
 >
-> It's yours, free. 20 min and I'll show you how to put it to work: [BOOKING_LINK]
+> It's yours, free. 20 min with Neal, our founder, and he'll show you how to put it to work: [BOOKING_LINK]
 
 ### B: Hardscape Bid Decoder. Subject: `the patio that sinks`
 
@@ -89,7 +89,7 @@ These are drafts. Neal approves or edits before anything sends.
 > I built {{company_name}} a bid decoder. Homeowners check what each quote actually includes and see why yours costs what it does, before they sign with the cheap guy:
 > {{tool_url}}
 >
-> It's yours, free. 20 min and I'll show you how to put it to work: [BOOKING_LINK]
+> It's yours, free. 20 min with Neal, our founder, and he'll show you how to put it to work: [BOOKING_LINK]
 
 ### Day 3, same thread (both variants)
 
@@ -106,7 +106,7 @@ These are drafts. Neal approves or edits before anything sends.
 > If you're booked out and fine being the highest-paid laborer in your company by day and the sales department at night, this isn't for you and I'll leave it there.
 >
 > If you'd rather have homeowners show up already knowing the price, it's built and waiting: {{tool_url}}
-> 20 min: [BOOKING_LINK]
+> 20 min with Neal: [BOOKING_LINK]
 
 ---
 
@@ -115,6 +115,6 @@ These are drafts. Neal approves or edits before anything sends.
 - **"Nearly 500" / "about 250" reviews:** we pulled 497 deck and 254 hardscape Google reviews.
 - **Deck quote** ("I never received a response"): verbatim from VOC deck pain #2 (~9 reviews). Price shock was tied at ~9.
 - **Hardscape quote** ("two to three times the market rate"): verbatim from VOC. Hardscape data is partly polluted, but this quote is from a landscaping/hardscape customer.
-- **"Angi sells the same homeowner to 4 other guys":** this is the line from Neal's setter script. Keep it only if Neal is comfortable standing behind "4". The safer version is "to several other contractors".
+- **"Angi sells the same homeowner to several other contractors":** this is the line from Neal's setter script. Keep it only if Neal is comfortable standing behind "4". The safer version is "to several other contractors".
 - **"Homeowners planning spring patios are pricing them out right now":** a reasonable seasonal claim, not a statistic. Cut it if Neal wants zero inference.
 - **Bid-decoder items** match the checklist keys in Grokbot's tools (footings, ledger, permit, tear-out; base, compaction, edge, drainage).
