@@ -137,3 +137,53 @@ campaigns = D3 / H3. Hold the rest for round 2.
 ## Metric
 Positive reply rate per delivered email (replies asking for the link or a call).
 Gate: 2% on 500+ sends per niche before scaling.
+
+---
+
+# v5: bolder versions (Nov 4)
+
+Rule: pick a fight with a belief, a habit or the cheap competitor. Never with the prospect.
+
+## Deck, Estimator. Subject: `free estimates are broken`
+Hey {{first_name}},
+Free estimates are a tax on good deck builders.
+You drive out, measure, price it properly, and the homeowner had half the budget all along. Or they were collecting three quotes to beat down the one they liked.
+The fix isn't working later at night. It's never quoting blind again.
+I built {{company_name}} a deck price estimator. Homeowners see the real range before they ever call you.
+It's free. Want it?
+
+## Deck, Bid Decoder. Subject: `the cheap deck guy`
+Hey {{first_name}},
+The cheap deck guy isn't beating you on price. He's beating you on what he leaves out: footings, ledger flashing, the permit, the tear-out.
+The homeowner can't see that, so they reward him for it.
+Stop losing jobs to someone who'll build it wrong. I built {{company_name}} a bid decoder that shows homeowners exactly what each quote skipped.
+It's free. Want it?
+
+## Hardscape, Estimator. Subject: `stop pricing in the driveway`
+Hey {{first_name}},
+Hiding the price until the site visit doesn't make you look premium. It makes homeowners assume you're expensive and hiding it.
+One wrote in a review that they'd been "paying two to three times the market rate." That's the fear you walk into on every call.
+Put a real range in front of them first. I built {{company_name}} a patio and paver estimator that does exactly that.
+It's free. Want it?
+
+## Hardscape, Bid Decoder. Subject: `cheap patios cost you jobs`
+Hey {{first_name}},
+Every patio that sinks makes your next sale harder.
+The guy who skipped the base, the compaction and the edge restraint is long gone. The homeowner just remembers that hardscapers can't be trusted.
+You shouldn't pay for his shortcuts. I built {{company_name}} a bid decoder that shows homeowners what every quote leaves out, before they sign.
+It's free. Want it?
+
+## Bold follow-up 1 (both niches, day 3, no link). Subject: same thread
+{{first_name}}, unpopular opinion: "we run on referrals" is how good contractors end up with a dead February.
+Referrals are great. They're also luck. You can't turn them up when the current build wraps.
+That's the part we fix. The free tool is step one. Want it?
+
+## Bold follow-up 2 (day 7, tool link only)
+Last one. If you like quoting at 9pm for people who are shopping you against the cheapest guy in town, ignore this.
+If you don't, it's built and it's yours: {{tool_url}}
+Reply "call" and Neal, our founder, will show you how to put it to work.
+
+## Watch
+More polarizing means more "stop" and hostile replies. Those are fine. Spam complaints are not.
+Track hostile replies and unsubscribes per 100 sends next to positive replies.
+"That's the part we fix" (follow-up 1) assumes the call offers lead generation. Confirm.
