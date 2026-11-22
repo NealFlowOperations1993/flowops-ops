@@ -58,6 +58,39 @@ not require 5,000/day.**
 - **A signal that becomes a factual claim needs real evidence**, never a keyword match.
 - **Deletion filters must be allow-list narrow** — a cleanup once deleted 177 real leads because
   real contractors are named Joe.
+- **Never guess email addresses** (e.g. firstname@company.com). Use only addresses published on
+  the company's own site, licence record or listing. Guessed addresses came back 13% Reoon-safe
+  vs 77–83% for published ones (Nov 18), wasting credits.
+- **Owner-only filter removed (Neal, Nov 19).** 5 of the 7 positives replied from a generic
+  inbox (e.g. tndeckworks@gmail.com). Any inbox the company publishes itself is allowed,
+  including info@ and office@; prefer a named person's when one is published. Every lead still
+  records `owner_evidence` (blank is fine), `source`, `source_url` and its score.
+- **Google Maps leads only (Neal, Nov 19).** No YellowPages, licence lists or manufacturer
+  locators. Tag every lead `source=google_maps` with its placeId. Fresh scraping is Apify
+  `compass~crawler-google-places` (~$0.004/place; server-side filters +$0.001 each; $200/cycle cap,
+  cycle Nov 20–Dec 19 — do NOT ask to raise it).
+- **The winning recipe (Nov 4–14, all positives). Restored Nov 21 — do not drift. No filter may
+  be added that did not exist then without Neal's say-so.**
+  - **Leads:** Google Maps "deck builder" + "deck contractor" in affluent counties. Rating ≥ 4.3,
+    20+ reviews (Claude's filter, Nov 19 — ~18% of the winning pool was below it; all positives
+    above), real site, no chain/supplier/franchise. **Do not require "deck" in the homepage
+    title, and do not restrict Apify to the "deck builder" category** — the winning deck pool was
+    only ~60% Google "Deck builder"; ~40% were general contractors, construction and fence
+    companies that build decks (positives G&J General Contractors, MAC Home Pros). Rule: category
+    "Deck builder" passes; other contractor categories pass if their own site mentions decks ≥2×;
+    drop painters, pressure washers, handymen, siding/roofing-first, stain/repair-only shops.
+  - **Email 1 is a MIX, not one email.** Deck Nov 4–14 positives per sends: "price shoppers"
+    2/281, "quick question" 1/35, "two homeowners" 1/17, "I'm just wondering" 1/~15. New deck
+    leads get 40% price shoppers + 20% each of the other three, word for word
+    (`scripts/pipeline/build_w.py`, variants J/Q/W/T; W uses the deck-project-planner tool).
+  - **Email 2:** "Bumping this up. Want me to send the deck designer over? It takes about a
+    minute to try." No link. The Nov 13 rewrite that put the link in Email 2 killed replies.
+  - **Email 3:** the breakup with the link.
+  - **Deck campaign 4336994:** 150 new leads/day (Neal, Nov 21), send window 8 AM–1 PM Central.
+- **Mix follows positives.** Deck gets the biggest share of new leads; HVAC the smallest.
+- **Dedupe by company name and phone too**, not just email/domain — a different address at a
+  company we already emailed is still a repeat.
+- **Reoon keep rule:** safe + catch_all + role_account; drop unknown, invalid, disabled.
 - **Scan every lead after an upload**, never a sample. A 25-lead sample once passed while 1,275
   were broken.
 - **Model calls go in n8n HTTP nodes**, not Code nodes — 60s limit kills them silently.
