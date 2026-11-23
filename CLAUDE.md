@@ -71,6 +71,11 @@ not require 5,000/day.**
   locators. Tag every lead `source=google_maps` with its placeId. Fresh scraping is Apify
   `compass~crawler-google-places` (~$0.004/place; server-side filters +$0.001 each; $200/cycle cap,
   cycle Nov 20–Dec 19 — do NOT ask to raise it).
+- **SCRAPING PAUSED (Neal, Nov 23).** After the Nov 23 deck scrape, launch NO Apify runs until
+  Neal says to resume. Apify cycle was ~$165 of $200 (98% our Google Maps actor). Leads are sized to
+  last to Nov 30: deck 75/day, W1-B hardscape 15/day, W2 mortgage 20/day. If deck runs short, lower
+  its daily cap rather than scrape. Next scrape needs a cheaper method (half of each search was
+  already-scraped places).
 - **The winning recipe (Nov 4–14, all positives). Restored Nov 21 — do not drift. No filter may
   be added that did not exist then without Neal's say-so.**
   - **Leads:** Google Maps "deck builder" + "deck contractor" in affluent counties. Rating ≥ 4.3,
