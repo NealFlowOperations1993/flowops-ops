@@ -34,7 +34,8 @@ not require 5,000/day.**
 
 ## Open work, in order
 
-1. **Reply to Ben** at `ben@codexconstruction.com` — asked "Ballpark?" on Sep 19, unanswered.
+1. ~~Reply to Ben (Codex, Sep 19).~~ Dropped (Neal, Nov 23): leads from the first launches
+   (before November) are too old to chase. The master prospect doc covers November onward only.
 2. ~~Wire the contractor notification.~~ **Done and verified (Nov 23).** The current tool site
    (Lovable Tool Studio, `brandable-toolbox-studio.lovable.app/t/...`) posts each submission to n8n
    `fo-toolstudio-lead` (workflow aR4U1sCh1HAuCxta, live since Nov 4), which emails the business's
