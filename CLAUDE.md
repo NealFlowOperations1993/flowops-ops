@@ -103,6 +103,12 @@ not require 5,000/day.**
 - **Per-company offer + price range (Neal, Nov 23):** each tool must show that company's own services/
   materials and a price range for that company — published prices from their site when they exist,
   otherwise a local-market estimate labelled as such. Never present an estimate as their own prices.
+- **Campaign Guard (Nov 23):** n8n workflow `TaS4QljV4fLfDMd7` checks all 10 sending campaigns every
+  5 min and auto-restores status, schedule (cap/window/days) and inboxes from n8n data table
+  `fo_campaign_expected` (`RUfMOReEhaXEjPN2`), alerting #cold-email; alerts on lead drops/new campaigns.
+  **Before changing any cap/window/status, update that table first** or the guard reverts it. Built
+  after another team's agent (GrokBot/Angel via Cursor) proposed holding our queued leads.
+  Smartlead gateway `vLADM6PiJ14ItZsv` stays unpublished except while we use it.
 - **Mix follows positives.** Deck gets the biggest share of new leads; HVAC the smallest.
 - **Dedupe by company name and phone too**, not just email/domain — a different address at a
   company we already emailed is still a repeat.
