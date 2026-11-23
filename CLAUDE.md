@@ -94,6 +94,14 @@ not require 5,000/day.**
     minute to try." No link. The Nov 13 rewrite that put the link in Email 2 killed replies.
   - **Email 3:** the breakup with the link.
   - **Deck campaign 4336994:** 150 new leads/day (Neal, Nov 21), send window 8 AM–1 PM Central.
+- **Branding is ALWAYS on (Neal, Nov 23).** Every new tool_prospects row now queues a branding job
+  automatically (DB trigger `tool_prospects_always_enrich`), however it's inserted. Root cause of
+  the Nov 9–23 gap: our uploads inserted rows with raw SQL, which skipped the import API's job queue,
+  so ~2,700 pages had no logo/colors. Worker: cron `tool-branding-enrichment` every minute →
+  `/api/public/enrich`, now 20 per run. Never remove the trigger.
+- **Per-company offer + price range (Neal, Nov 23):** each tool must show that company's own services/
+  materials and a price range for that company — published prices from their site when they exist,
+  otherwise a local-market estimate labelled as such. Never present an estimate as their own prices.
 - **Mix follows positives.** Deck gets the biggest share of new leads; HVAC the smallest.
 - **Dedupe by company name and phone too**, not just email/domain — a different address at a
   company we already emailed is still a repeat.
