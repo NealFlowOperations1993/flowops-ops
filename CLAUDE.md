@@ -35,9 +35,11 @@ not require 5,000/day.**
 ## Open work, in order
 
 1. **Reply to Ben** at `ben@codexconstruction.com` — asked "Ballpark?" on Sep 19, unanswered.
-2. **Wire the contractor notification.** Tool submissions hit n8n `fo-tool-lead`, get logged and
-   Slacked to us, but **never reach the contractor** — while the email promises they do.
-   Affects all 2,558 live tool pages.
+2. ~~Wire the contractor notification.~~ **Done and verified (Nov 23).** The current tool site
+   (Lovable Tool Studio, `brandable-toolbox-studio.lovable.app/t/...`) posts each submission to n8n
+   `fo-toolstudio-lead` (workflow aR4U1sCh1HAuCxta, live since Nov 4), which emails the business's
+   `owner_email` via Gmail with the homeowner's details (bcc raine@). Routing check passed Nov 23.
+   No real homeowner submission yet. (The old `fo-tool-lead` note applied to the retired Vercel pages.)
 3. **Rebuild the copy as ONE new campaign** — compliant subjects, no orphaned lines, no
    monthly-payment promise, plus a pre-send coherence check.
 4. Refill the lead list (~$8.60/day of Google Maps scraping).
