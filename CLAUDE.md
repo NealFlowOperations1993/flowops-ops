@@ -111,6 +111,11 @@ not require 5,000/day.**
   **Before changing any cap/window/status, update that table first** or the guard reverts it. Built
   after another team's agent (GrokBot/Angel via Cursor) proposed holding our queued leads.
   Smartlead gateway `vLADM6PiJ14ItZsv` stays unpublished except while we use it.
+- **Inbox disconnect alarm (Nov 25).** Campaign Guard `TaS4QljV4fLfDMd7` (every 30 min) checks all 20 cold-email
+  inboxes for SMTP/IMAP failure, suspension, or warmup blocked/off; calls Smartlead
+  `POST /email-accounts/reconnect-failed-email-accounts`; DMs Neal (Brutus bot, U0AFMPD5CPM) on a new problem, every 2h
+  while unresolved, and when fixed. Password changes caused the Nov 16–17 disconnects: never change a sending inbox's
+  password without reconnecting it the same day.
 - **Every emailed tool link must load (Nov 25).** DB trigger `tool_prospects_ensure_niche_tools` gives every
   page its niche's full tool set on insert/update; never remove it. Before Nov 25, 30 W3 Hardscape planner links
   and up to 42 early W3 Deck planner links showed "Tool not found" (incl. positive G&J). After any upload, test
