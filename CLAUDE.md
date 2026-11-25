@@ -115,6 +115,13 @@ not require 5,000/day.**
   page its niche's full tool set on insert/update; never remove it. Before Nov 25, 30 W3 Hardscape planner links
   and up to 42 early W3 Deck planner links showed "Tool not found" (incl. positive G&J). After any upload, test
   every emailed tool type, not just one, and tell Neal immediately about anything a prospect may have hit.
+- **Inbox sender names are locked (Nov 25).** Re-signing an inbox into Smartlead with Google (e.g. after the
+  Nov 16 password change) copies the Google account's name into `from_name` — that is how Priya Iyer became
+  "Priya Shah", Ashley Park "Ashley Morgan", Roddy Hayes "Roddy Gulag", Mason Reed "Mason Johnson" and John Carter
+  "John Smith", so emails said one name and signed another. The Nov 4–14 names (proven from From headers in
+  prospect replies) were restored, and Inbox Limit Guard `t0sU6Afy2tjycbRc` now restores every inbox's name and
+  signature (`<div>Name</div><div>FlowOperations</div>`) 5x daily. carly@ stays "Marly Thakkar" (Neal's call). To
+  rename an inbox, edit the guard's NAMES list first. Renaming the Google Workspace users to match stops the drift at source.
 - **Mix follows positives.** Deck gets the biggest share of new leads; HVAC the smallest.
 - **Dedupe by company name and phone too**, not just email/domain — a different address at a
   company we already emailed is still a repeat.
