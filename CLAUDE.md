@@ -55,7 +55,9 @@ not require 5,000/day.**
   `sl_lead_email` is the prospect.
 - **Open rate is not real.** Raw ~48% is mostly security scanners — median time-to-open is 24
   seconds and there are 0 clicks on 1,610 opens. True rate is 14–18%. Judge on replies.
-- **A reply under 6 minutes is a machine**, not a human.
+- **Judge replies by their text, not their speed (Nov 25).** The old "under 6 minutes = machine" rule was wrong:
+  5 genuine replies came within 6 minutes (Tennessee Deckworks 1 min, booked David De La Torre 2 min). Drop
+  out-of-office, auto-acknowledgements, ticket systems and bounces by content. Human replies since Nov 4: 19.
 - **Never assert an absence** ("you have no booking page") from one page of evidence. Criticism
   openers produced most of our hostile replies.
 - **A signal that becomes a factual claim needs real evidence**, never a keyword match.
