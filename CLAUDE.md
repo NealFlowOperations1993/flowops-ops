@@ -113,7 +113,7 @@ not require 5,000/day.**
   Smartlead gateway `vLADM6PiJ14ItZsv` stays unpublished except while we use it.
 - **Inbox disconnect alarm (Nov 25).** Campaign Guard `TaS4QljV4fLfDMd7` (every 30 min) checks all 20 cold-email
   inboxes for SMTP/IMAP failure, suspension, or warmup blocked/off; calls Smartlead
-  `POST /email-accounts/reconnect-failed-email-accounts`; DMs Neal (Brutus bot, U0AFMPD5CPM) on a new problem, every 2h
+  `POST /email-accounts/reconnect-failed-email-accounts`; DMs Raine Macaraeg (Brutus bot, U0C78GKR5NF; Neal, Nov 25) on a new problem, every 2h
   while unresolved, and when fixed. Password changes caused the Nov 16–17 disconnects: never change a sending inbox's
   password without reconnecting it the same day.
 - **Every emailed tool link must load (Nov 25).** DB trigger `tool_prospects_ensure_niche_tools` gives every
