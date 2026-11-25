@@ -109,6 +109,10 @@ not require 5,000/day.**
   **Before changing any cap/window/status, update that table first** or the guard reverts it. Built
   after another team's agent (GrokBot/Angel via Cursor) proposed holding our queued leads.
   Smartlead gateway `vLADM6PiJ14ItZsv` stays unpublished except while we use it.
+- **Every emailed tool link must load (Nov 25).** DB trigger `tool_prospects_ensure_niche_tools` gives every
+  page its niche's full tool set on insert/update; never remove it. Before Nov 25, 30 W3 Hardscape planner links
+  and up to 42 early W3 Deck planner links showed "Tool not found" (incl. positive G&J). After any upload, test
+  every emailed tool type, not just one, and tell Neal immediately about anything a prospect may have hit.
 - **Mix follows positives.** Deck gets the biggest share of new leads; HVAC the smallest.
 - **Dedupe by company name and phone too**, not just email/domain — a different address at a
   company we already emailed is still a repeat.
