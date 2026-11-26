@@ -3,6 +3,7 @@
 #
 #   python3 lead_supply.py budget                 -> Apify $ left, days to reset, today's allowance
 #   python3 lead_supply.py scrape <workdir>       -> pick areas, run the cheap actor with excludeCids, update registry
+#   python3 lead_supply.py verify <workdir> [max_credits]  -> Reoon via n8n (publish EWA6SgxsdzJUjXa8 first), keeps safe/catch_all/role
 #   python3 lead_supply.py screen <workdir> <idx.json> <dnc.json>
 #                                                 -> winning-recipe screen + dedupe -> REOON_GM_<DATE>_{DECK,HARDSCAPE}.csv
 #
@@ -23,6 +24,8 @@ TERMS = {'deck': ['deck builder', 'deck contractor', 'deck company', 'deck insta
 PER_QUERY = 60                                    # places per search (excluded places don't count or cost)
 COST_PER_PLACE = 0.001
 LOG_HOOK = 'https://exaltisgroup.app.n8n.cloud/webhook/fo-supply-log-7q2k'
+REOON_HOOK = 'https://exaltisgroup.app.n8n.cloud/webhook/fo-reoon-verify-3k9d'   # n8n EWA6SgxsdzJUjXa8; publish only while verifying
+KEEP_STATUS = {'safe', 'catch_all', 'role_account'}
 FB_LOOKUP = False   # Nov 26 test: facebook.com returns its "Sorry, something went wrong" page to our fetcher (www and m.), so it's off
 PIPE = os.path.dirname(os.path.abspath(__file__))
 
@@ -338,12 +341,48 @@ def prep_retry(W, days=7):
     return {n: len(xs) for n, xs in out.items()}
 
 
+def verify(W, max_credits=480):
+    """Reoon-verify today's sidecars (best-first, deck before hardscape) without exceeding max_credits
+    (Reoon daily limit is 500). Keep safe + catch_all + role_account. Writes READY_GM_<DATE>_<TAG>.json in W."""
+    date = datetime.date.today().strftime('%b%d').upper(); used = 0; out = {}
+    for tag in ('DECK', 'HARDSCAPE'):
+        fp = os.path.join(W, f'srcs_GM_{date}_{tag}.json')
+        if not os.path.exists(fp):
+            continue
+        rows = json.load(open(fp)); todo = [r for r in rows if not r.get('reoon')]
+        for i in range(0, len(todo), 25):
+            chunk = todo[i:i + 25][:max(0, max_credits - used)]
+            if not chunk:
+                break
+            res = []
+            for a in range(3):
+                p = subprocess.run(['curl', '-sS', '-m', '600', '-X', 'POST', '-H', 'Content-Type: application/json', '--data-binary', '@-', REOON_HOOK],
+                                   input=json.dumps({'emails': [r['email'] for r in chunk]}).encode(), capture_output=True)
+                try:
+                    res = json.loads(p.stdout); break
+                except Exception:
+                    time.sleep(10)
+            st = {x['email']: x['status'] for x in res if isinstance(x, dict)}
+            for r in chunk:
+                r['reoon'] = st.get(r['email'], '')
+            used += len(chunk)
+        json.dump(rows, open(fp, 'w'), indent=1)
+        ready = [r for r in rows if r.get('reoon') in KEEP_STATUS]
+        json.dump(ready, open(os.path.join(W, f'READY_GM_{date}_{tag}.json'), 'w'), indent=1)
+        out[tag] = {'rows': len(rows), 'verified': sum(1 for r in rows if r.get('reoon')), 'ready': len(ready),
+                    'status': dict(collections.Counter(r.get('reoon') or 'not verified' for r in rows))}
+    out['credits_used'] = used
+    return out
+
+
 if __name__ == '__main__':
     cmd = sys.argv[1]
     if cmd == 'budget':
         print(json.dumps(budget(), indent=1))
     elif cmd == 'scrape':
         print(json.dumps(scrape(sys.argv[2], float(sys.argv[3]) if len(sys.argv) > 3 else None), indent=1, default=str))
+    elif cmd == 'verify':
+        print(json.dumps(verify(sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 480), indent=1))
     elif cmd == 'prep_retry':
         print(json.dumps(prep_retry(sys.argv[2])))
     elif cmd == 'screen':
