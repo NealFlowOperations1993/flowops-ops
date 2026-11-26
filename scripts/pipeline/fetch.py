@@ -3,6 +3,8 @@ import json,os,subprocess,threading,time
 from concurrent.futures import ThreadPoolExecutor
 CACHE=os.environ.get('FETCH_CACHE','pages.jsonl')
 URL='https://exaltisgroup.app.n8n.cloud/webhook/fo-page-fetch-x81k2'
+# FETCH_KEEP_HTML=1 keeps raw HTML (capped) for Cloudflare email decoding and ad-tag checks (lead_supply.py).
+KEEP_HTML=os.environ.get('FETCH_KEEP_HTML')=='1'
 lock=threading.Lock()
 def cached():
     got={}
@@ -12,14 +14,16 @@ def cached():
             except Exception: pass
     return got
 def call(batch):
-    body=json.dumps({'lean':True,'batch':[{'tag':str(i),'url':u} for i,u in enumerate(batch)]})
+    body=json.dumps({'lean':not KEEP_HTML,'batch':[{'tag':str(i),'url':u} for i,u in enumerate(batch)]})
     for a in range(3):
         p=subprocess.run(['curl','-sS','-m','280','-X','POST','-H','Content-Type: application/json','--data-binary','@-',URL],input=body.encode(),capture_output=True)
         try:
             d=json.loads(p.stdout); data=d['data'] if isinstance(d.get('data'),list) else [d['data']]
             out=[]
             for x in data:
-                i=int(x.get('tag')); x.pop('html',None); x['url_req']=batch[i]; out.append(x)
+                i=int(x.get('tag')); h=x.pop('html',None)
+                if KEEP_HTML and h: x['html']=h[:300000]
+                x['url_req']=batch[i]; out.append(x)
             return out
         except Exception: time.sleep(5)
     return [{'url_req':u,'err':'gateway_fail','text':'','emails':[],'links':[]} for u in batch]

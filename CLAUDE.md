@@ -139,6 +139,31 @@ not require 5,000/day.**
 - **Check `campaign_lead_stats.notStarted` before judging performance.** A dry list looks
   identical to a paused campaign in reports.
 
+## Lead supply system (Nov 26) — scrape daily, never pay twice, warn early
+
+Goal (Neal, Nov 26): deck ≥ 100 new leads/day; hardscape ≥ 7 days runway at 20/day. Google Maps only; filters unchanged.
+
+- **Actor:** Apify `santamaria-automations~google-maps-scraper` ($1/1,000 places, no filter surcharge, same data
+  as compass — tested Nov 26). Run via `scripts/pipeline/lead_supply.py` (`budget`, `scrape <dir>`, `prep_retry <dir>`,
+  `screen <dir> <idx.json> <dnc.json>`). Apify calls go through this cloud environment's proxy credential; the n8n
+  Apify credentials are all dead (401), so scraping runs in a Claude session, not n8n.
+- **Never pay for a known place:** every run passes `excludeCids` = every CID we have ever scraped. Tested Nov 26:
+  excluded places are skipped and **not charged**; the actor returns deeper, unseen places instead. Registry =
+  Apify KV store `fo-lead-supply` (`Ca6Cu8iAJ7xQuGtFv`), record `registry.gz` (37,890 CIDs backfilled from all 215
+  past Maps datasets); `areas` = county queues (unsearched counties bordering ≥2 searched ones; picks steer to the
+  best usable-per-$ states); `unreadable` = sites that failed to load, retried weekly.
+- **Budget:** keep $2 buffer; spend up to 30% of what's left per day (front-loaded), never less than the even pace;
+  deck 85% / hardscape 15%. Cycle Nov 20 – Dec 19 23:59 UTC (resets Dec 20). Never ask to raise the $200 cap.
+- **Deck phrases:** "deck builder", "deck contractor", "deck company", "deck installer" (last two added Nov 26;
+  drop one if its usable-per-$ in `fo_searched_areas` is clearly worse). Hardscape: "hardscape contractor", "paver installer".
+- **Logs:** n8n tables `fo_searched_areas` (`F4mK2FUDjD5JT9zD`, yield per area and per phrase) and
+  `fo_lead_supply_daily` (`G3PFAg0N8V61rLAS`), via webhook `fo-supply-log-7q2k` (workflow `PCWEuLZwLlSr9ZhJ`).
+- **Forecast:** workflow `wH2P6UQDC3Mg4Dwp` (4:40 PM CT) posts queue runway, scrape rate and Apify $ left to
+  fo_ce_events → Evening report; a WARNING line when deck runway < 7 days or supply won't cover the cap to the reset.
+- **Facebook email lookup:** off — facebook.com serves an error page to our fetcher (Nov 26).
+- **After the Apify budget runs out:** Google Places API free tier is the planned fallback (see Neal's notes; needs a
+  Google Cloud project + key from Neal). Until then: lower the deck cap rather than buy outside Google Maps.
+
 ## Where things live
 
 | Resource | Location |
