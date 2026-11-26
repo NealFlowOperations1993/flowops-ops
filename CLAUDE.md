@@ -160,6 +160,15 @@ Goal (Neal, Nov 26): deck ≥ 100 new leads/day; hardscape ≥ 7 days runway at 
   `fo_lead_supply_daily` (`G3PFAg0N8V61rLAS`), via webhook `fo-supply-log-7q2k` (workflow `PCWEuLZwLlSr9ZhJ`).
 - **Forecast:** workflow `wH2P6UQDC3Mg4Dwp` (4:40 PM CT) posts queue runway, scrape rate and Apify $ left to
   fo_ce_events → Evening report; a WARNING line when deck runway < 7 days or supply won't cover the cap to the reset.
+- **Areas:** first ring (unsearched counties bordering ≥2 searched), then second ring (≥1), then re-searches of the
+  best counties (exclusion makes Google return deeper, unseen places). Picks sized by observed cost per county.
+- **Reoon:** `lead_supply.py verify` via n8n webhook `EWA6SgxsdzJUjXa8` (publish only while verifying; credential
+  "Reoon API Key"). Uses only today's remaining DAILY credits minus 5 (never instant credits), oldest pending first,
+  deck best-first; writes `READY_GM_<DATE>_*.json` (safe + catch_all + role_account) for the standard upload.
+- **Daily run:** scheduled task `trig_01Aupstn56QqERvg1DFDoXVs` (5:23 AM CT, this session): scrape → dedupe → screen →
+  verify → tell Neal and ask for his go before uploading. One paid scrape per day (`areas.last_scrape` guard).
+- **Nov 26 first run:** $2.80 for 3,157 new places (0 known returned) → 114 deck + 79 hardscape usable
+  (~63 deck / ~79 hardscape usable per $). Usable per $ by deck phrase: builder 57, contractor 54, company 61, installer 52.
 - **Facebook email lookup:** off — facebook.com serves an error page to our fetcher (Nov 26).
 - **After the Apify budget runs out:** Google Places API free tier is the planned fallback (see Neal's notes; needs a
   Google Cloud project + key from Neal). Until then: lower the deck cap rather than buy outside Google Maps.

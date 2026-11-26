@@ -105,11 +105,17 @@ def pick_areas(A, niche, n):
     st = A[niche].setdefault('state_yield', {})
     rates = [v['usable'] / v['usd'] for v in st.values() if v.get('usd', 0) >= 0.05]
     avg = sum(rates) / len(rates) if rates else 1.0
-    q = [a for a in A[niche]['queue'] if a not in A[niche]['avoid'] and a not in A[niche]['done']]
     def rate(a):
         v = st.get(a.split(', ')[-1])
         return v['usable'] / v['usd'] if v and v.get('usd', 0) >= 0.05 else avg
-    return sorted(q, key=lambda a: -rate(a))[:n]
+    avoid = set(A[niche]['avoid']); done = set(A[niche]['done'])
+    q = sorted([a for a in A[niche]['queue'] if a not in avoid and a not in done], key=lambda a: -rate(a))
+    if len(q) < n:   # first ring used up: counties bordering one searched county
+        q += sorted([a for a in A[niche].get('queue2', []) if a not in avoid and a not in done and a not in q], key=lambda a: -rate(a))
+    if len(q) < n:   # then re-search the best counties: known places are excluded (free), so Google gives deeper ones
+        rs = A[niche].setdefault('research', {})
+        q += sorted([a for a in done if a not in avoid and rs.get(a, 0) < 2], key=lambda a: (rs.get(a, 0), -rate(a)))
+    return q[:n]
 
 
 def scrape(W, max_usd=None):
@@ -151,8 +157,12 @@ def scrape(W, max_usd=None):
         searched = {(x.get('searchString') or '').split(' in ', 1)[-1] for x in items}
         for a in r['areas']:
             if a in searched or r['status'] == 'SUCCEEDED':
-                A[r['niche']]['done'].append(a)
+                if a in A[r['niche']]['done']:
+                    rs = A[r['niche']].setdefault('research', {}); rs[a] = rs.get(a, 0) + 1
+                else:
+                    A[r['niche']]['done'].append(a)
                 A[r['niche']]['queue'] = [z for z in A[r['niche']]['queue'] if z != a]
+                A[r['niche']]['queue2'] = [z for z in A[r['niche']].get('queue2', []) if z != a]
                 if got.get(a, 0) == 0:
                     A[r['niche']]['avoid'].append(a)
         r['places_per_area'] = dict(got)
@@ -341,39 +351,44 @@ def prep_retry(W, days=7):
     return {n: len(xs) for n, xs in out.items()}
 
 
-def verify(W, max_credits=480):
-    """Reoon-verify today's sidecars (best-first, deck before hardscape) without exceeding max_credits
-    (Reoon daily limit is 500). Keep safe + catch_all + role_account. Writes READY_GM_<DATE>_<TAG>.json in W."""
-    date = datetime.date.today().strftime('%b%d').upper(); used = 0; out = {}
-    for tag in ('DECK', 'HARDSCAPE'):
-        fp = os.path.join(W, f'srcs_GM_{date}_{tag}.json')
-        if not os.path.exists(fp):
-            continue
-        rows = json.load(open(fp)); todo = [r for r in rows if not r.get('reoon')]
-        for i in range(0, len(todo), 25):
-            chunk = todo[i:i + 25][:max(0, max_credits - used)]
-            if not chunk:
-                break
-            res = []
-            for a in range(3):
-                p = subprocess.run(['curl', '-sS', '-m', '600', '-X', 'POST', '-H', 'Content-Type: application/json', '--data-binary', '@-', REOON_HOOK],
-                                   input=json.dumps({'emails': [r['email'] for r in chunk]}).encode(), capture_output=True)
-                try:
-                    res = json.loads(p.stdout); break
-                except Exception:
-                    time.sleep(10)
-            st = {x['email']: x['status'] for x in res if isinstance(x, dict)}
-            for r in chunk:
-                r['reoon'] = st.get(r['email'], '')
-            used += len(chunk)
-        json.dump(rows, open(fp, 'w'), indent=1)
-        ready = [r for r in rows if r.get('reoon') in KEEP_STATUS]
-        json.dump(ready, open(os.path.join(W, f'READY_GM_{date}_{tag}.json'), 'w'), indent=1)
-        out[tag] = {'rows': len(rows), 'verified': sum(1 for r in rows if r.get('reoon')), 'ready': len(ready),
-                    'status': dict(collections.Counter(r.get('reoon') or 'not verified' for r in rows))}
-    out['credits_used'] = used
-    return out
+def reoon(payload):
+    for a in range(3):
+        p = subprocess.run(['curl', '-sS', '-m', '600', '-X', 'POST', '-H', 'Content-Type: application/json', '--data-binary', '@-', REOON_HOOK],
+                           input=json.dumps(payload).encode(), capture_output=True)
+        try:
+            return json.loads(p.stdout)
+        except Exception:
+            time.sleep(10)
+    raise SystemExit(f'Reoon webhook failed: {p.stdout[:200]!r}')
 
+
+def verify(W, max_credits=480, keep_daily=5):
+    """Reoon-verify pending leads (oldest day first, best-first within a day, deck before hardscape) using only the
+    DAILY credits left today minus `keep_daily` (instant credits are never touched). Keep safe + catch_all + role_account.
+    Writes READY_GM_<DATE>_<TAG>.json next to each sidecar."""
+    import glob
+    bal = reoon({'balance': True}); bal = bal[0] if isinstance(bal, list) else bal
+    budget_ = max(0, min(max_credits, int(bal.get('remaining_daily_credits') or 0) - keep_daily)); used = 0; out = {}
+    root = os.path.dirname(os.path.abspath(W))
+    for tag in ('DECK', 'HARDSCAPE'):
+        for fp in sorted(glob.glob(os.path.join(root, '*', f'srcs_GM_*_{tag}.json'))):
+            rows = json.load(open(fp)); todo = [r for r in rows if not r.get('reoon')]
+            for i in range(0, len(todo), 25):
+                chunk = todo[i:i + 25][:max(0, budget_ - used)]
+                if not chunk:
+                    break
+                st = {x['email']: x['status'] for x in reoon({'emails': [r['email'] for r in chunk]}) if isinstance(x, dict) and x.get('status') not in (None, 'error')}
+                for r in chunk:
+                    if r['email'] in st:
+                        r['reoon'] = st[r['email']]
+                used += len(chunk)
+            json.dump(rows, open(fp, 'w'), indent=1)
+            ready = [r for r in rows if r.get('reoon') in KEEP_STATUS]
+            json.dump(ready, open(fp.replace('srcs_GM_', 'READY_GM_'), 'w'), indent=1)
+            out[os.path.basename(fp)] = {'rows': len(rows), 'verified': sum(1 for r in rows if r.get('reoon')), 'ready': len(ready),
+                                         'status': dict(collections.Counter(r.get('reoon') or 'pending' for r in rows))}
+    out['credits_used'] = used; out['daily_credits_before'] = bal.get('remaining_daily_credits')
+    return out
 
 if __name__ == '__main__':
     cmd = sys.argv[1]
