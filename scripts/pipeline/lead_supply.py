@@ -195,12 +195,25 @@ def screen(W, idx_path, dnc_path):
     CHAIN = g['CHAIN']; site_skip = g['site_skip']
     date = datetime.date.today().strftime('%b%d').upper()
     report = {}
+    deck_pids = set()   # places kept as deck leads (incl. cross-screened hardscape places): never also a hardscape lead
+    # Cross-niche (Nov 27): every hardscape place we paid for is also checked against the unchanged DECK rule.
+    # A place goes to one campaign only; deck wins when both pass. Deck mentions that are only "pool deck" or
+    # "deck removal" don't count for these (upload-audit practice), so hauling/pool shops aren't pulled in.
+    INCIDENTAL = re.compile(r'pool\s*decks?|decks?\s*removal|remov\w*\s+(?:old\s+)?decks?', re.I)
+    DECKW = re.compile(r'\bdecks?\b|decking', re.I)
     for niche in ('deck', 'hardscape'):
         raw = []
         for fn_ in (f'raw_{niche}.json', f'raw_retry_{niche}.json'):   # today's new places + weekly retry of unreadable sites
             fp = os.path.join(W, fn_)
             if os.path.exists(fp):
                 raw += [dict(x, _retry=fn_.startswith('raw_retry')) for x in json.load(open(fp))]
+        if niche == 'deck':
+            for fn_ in ('raw_hardscape.json', 'raw_retry_hardscape.json'):
+                fp = os.path.join(W, fn_)
+                if os.path.exists(fp):
+                    raw += [dict(x, _retry=fn_.startswith('raw_retry'), _cross=True) for x in json.load(open(fp))]
+        else:
+            raw = [x for x in raw if x['placeId'] not in deck_pids]
         if not raw:
             continue
         rej = collections.Counter(); pre = []; via = collections.Counter(); unread = []; back = []
@@ -255,10 +268,14 @@ def screen(W, idx_path, dnc_path):
             if g['SUPPLIER'].search((x.get('title') or '') + ' ' + (home.get('title') or '')): rej['supplier'] += 1; continue
             if g['FRANCH'].search(text): rej['franchise'] += 1; continue
             okn, why = g['niche_ok'](niche, x, pages)
-            if not okn: rej[why] += 1; continue
+            if not okn: rej[('cross: ' if x.get('_cross') else '') + why] += 1; continue
+            if x.get('_cross') and x.get('categoryName') != 'Deck builder':
+                blob = (x.get('title') or '') + ' ' + ' '.join((p.get('title') or '') + ' ' + (p.get('desc') or '') + ' ' + (p.get('text') or '') for p in pages)
+                if len(DECKW.findall(INCIDENTAL.sub(' ', blob))) < 2: rej['cross: only pool-deck/deck-removal mentions'] += 1; continue
             if not g['site_match'](x, pages): rej["site doesn't match listing"] += 1; continue
             r = g['pick']({'url': u, 'rec': {'dom': host_dom(u)}, 'pages': pages}, niche)
             src_ = 'retry' if x.get('_retry') else ('cloudflare' if r and any(p.get('url') == r.get('source_url') and not p.get('text') for p in pages) else 'site')
+            if x.get('_cross'): src_ = 'cross_from_hardscape'
             if not r and x['placeId'] in fbmap:      # their own Facebook page; same email rules (own domain or free mailbox)
                 fbp = P.get(fbmap[x['placeId']])
                 if ok(fbp):
@@ -274,6 +291,7 @@ def screen(W, idx_path, dnc_path):
             if e in E or (ed not in FREE and ed in D) or wd in D or (len(k) >= 5 and k in C) or (p10 and p10 in PH): rej['already emailed / DNC'] += 1; continue
             if e in sE or (k and k in sC) or (p10 and p10 in sP) or wd in sW: rej['duplicate in batch'] += 1; continue
             sE.add(e); sC.add(k); sW.add(wd); p10 and sP.add(p10)
+            if niche == 'deck': deck_pids.add(x['placeId'])
             hom = home.get('html') or ''
             ads_g = 'yes' if re.search(r'AW-\d{6,}|googleadservices|gtag/js\?id=AW', hom) else ('no' if hom else 'unknown')
             ads_m = 'yes' if re.search(r'fbq\(|fbevents\.js', hom) else ('no' if hom else 'unknown')
@@ -287,18 +305,23 @@ def screen(W, idx_path, dnc_path):
                          'email_found_on': r.get('source_url'), 'owner_name': fn if oe else '', 'owner_evidence': oe, 'rating': x.get('totalScore'), 'reviews': rc,
                          'ads_google': ads_g, 'ads_meta': ads_m, 'homepage_title': html.unescape(home.get('title') or ''),
                          'named_inbox': is_person(e.split('@')[0])})
-        if niche == 'deck':
+        if niche == 'deck':   # hardscape (screened next) must not repeat any company kept as deck
+            for k_ in keep:
+                E.add(k_['email']); C.add(ck(k_['company'])) if len(ck(k_['company'] or '')) >= 5 else None
+                D.add(host_dom(k_['website']).replace('www.', '')); ph(k_['phone']) and PH.add(ph(k_['phone']))
             keep.sort(key=lambda z: (0 if (z['categoryName'] == 'Deck builder' and (z['reviews'] or 0) >= 35) else 1 if (z['reviews'] or 0) >= 35 else 2))
         tag = 'DECK' if niche == 'deck' else 'HARDSCAPE'
         out = os.path.join(os.path.dirname(PIPE), '..', f'REOON_GM_{date}_{tag}.csv')
         with open(os.path.abspath(out), 'w') as f:
             f.write('email\n' + ''.join(k['email'] + '\n' for k in keep))
         json.dump(keep, open(os.path.join(W, f'srcs_GM_{date}_{tag}.json'), 'w'), indent=1)
-        phrase = collections.Counter(k['searchString'].split(' in ', 1)[0] for k in keep if k.get('searchString'))
-        area = collections.Counter(k['searchString'].split(' in ', 1)[-1] for k in keep if k.get('searchString'))
+        own = [k for k in keep if k['found_via'] != 'cross_from_hardscape']
+        phrase = collections.Counter(k['searchString'].split(' in ', 1)[0] for k in own if k.get('searchString'))
+        area = collections.Counter(k['searchString'].split(' in ', 1)[-1] for k in own if k.get('searchString'))
         report[niche] = {'raw_new': len(raw), 'prefilter_pass': len(pre), 'usable': len(keep), 'file': os.path.abspath(out), 'rejected': dict(rej),
                          'found_via': dict(via), 'usable_by_phrase': dict(phrase), 'usable_by_area': dict(area),
-                         'places_by_phrase': dict(collections.Counter((x.get('searchString') or '').split(' in ', 1)[0] for x in raw if not x.get('_retry'))),
+                         'places_by_phrase': dict(collections.Counter((x.get('searchString') or '').split(' in ', 1)[0] for x in raw if not x.get('_retry') and not x.get('_cross'))),
+                         'cross_from_hardscape': len(keep) - len(own),
                          'unreadable': len(unread)}
         report[niche]['_unread'] = unread; report[niche]['_back'] = back; report[niche]['retry_sites_back'] = len(back)
     # learn: usable per $ by state (steers tomorrow's county picks), unreadable places for the weekly retry, log rows

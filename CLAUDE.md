@@ -169,6 +169,9 @@ Goal (Neal, Nov 26): deck ≥ 100 new leads/day; hardscape ≥ 7 days runway at 
   verify → tell Neal and ask for his go before uploading. One paid scrape per day (`areas.last_scrape` guard).
 - **Nov 26 first run:** $2.80 for 3,157 new places (0 known returned) → 114 deck + 79 hardscape usable
   (~63 deck / ~79 hardscape usable per $). Usable per $ by deck phrase: builder 57, contractor 54, company 61, installer 52.
+- **Cross-niche deck screen (Nov 27):** `screen` also checks every hardscape place against the unchanged deck rule; a place
+  goes to one campaign only (deck wins), and "pool deck"/"deck removal" mentions don't count. One-off on already-paid places
+  (Nov 27): 2,900 hardscape + 90 fence/pool/roofing places → 28 new deck leads for $0 (mostly landscapers that build decks).
 - **Facebook email lookup:** off — facebook.com serves an error page to our fetcher (Nov 26).
 - **After the Apify budget runs out:** Google Places API free tier is the planned fallback (see Neal's notes; needs a
   Google Cloud project + key from Neal). Until then: lower the deck cap rather than buy outside Google Maps.
