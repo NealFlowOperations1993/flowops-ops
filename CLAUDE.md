@@ -34,10 +34,13 @@ not require 5,000/day.**
 
 ## Open work, in order
 
-1. **Reply to Ben** at `ben@codexconstruction.com` — asked "Ballpark?" on Sep 19, unanswered.
-2. **Wire the contractor notification.** Tool submissions hit n8n `fo-tool-lead`, get logged and
-   Slacked to us, but **never reach the contractor** — while the email promises they do.
-   Affects all 2,558 live tool pages.
+1. ~~Reply to Ben (Codex, Sep 19).~~ Dropped (Neal, Nov 23): leads from the first launches
+   (before November) are too old to chase. The master prospect doc covers November onward only.
+2. ~~Wire the contractor notification.~~ **Done and verified (Nov 23).** The current tool site
+   (Lovable Tool Studio, `brandable-toolbox-studio.lovable.app/t/...`) posts each submission to n8n
+   `fo-toolstudio-lead` (workflow aR4U1sCh1HAuCxta, live since Nov 4), which emails the business's
+   `owner_email` via Gmail with the homeowner's details (bcc raine@). Routing check passed Nov 23.
+   No real homeowner submission yet. (The old `fo-tool-lead` note applied to the retired Vercel pages.)
 3. **Rebuild the copy as ONE new campaign** — compliant subjects, no orphaned lines, no
    monthly-payment promise, plus a pre-send coherence check.
 4. Refill the lead list (~$8.60/day of Google Maps scraping).
@@ -52,17 +55,126 @@ not require 5,000/day.**
   `sl_lead_email` is the prospect.
 - **Open rate is not real.** Raw ~48% is mostly security scanners — median time-to-open is 24
   seconds and there are 0 clicks on 1,610 opens. True rate is 14–18%. Judge on replies.
-- **A reply under 6 minutes is a machine**, not a human.
+- **Judge replies by their text, not their speed (Nov 25).** The old "under 6 minutes = machine" rule was wrong:
+  5 genuine replies came within 6 minutes (Tennessee Deckworks 1 min, booked David De La Torre 2 min). Drop
+  out-of-office, auto-acknowledgements, ticket systems and bounces by content. Human replies since Nov 4: 19.
 - **Never assert an absence** ("you have no booking page") from one page of evidence. Criticism
   openers produced most of our hostile replies.
 - **A signal that becomes a factual claim needs real evidence**, never a keyword match.
 - **Deletion filters must be allow-list narrow** — a cleanup once deleted 177 real leads because
   real contractors are named Joe.
+- **Never guess email addresses** (e.g. firstname@company.com). Use only addresses published on
+  the company's own site, licence record or listing. Guessed addresses came back 13% Reoon-safe
+  vs 77–83% for published ones (Nov 18), wasting credits.
+- **Owner-only filter removed (Neal, Nov 19).** 5 of the 7 positives replied from a generic
+  inbox (e.g. tndeckworks@gmail.com). Any inbox the company publishes itself is allowed,
+  including info@ and office@; prefer a named person's when one is published. Every lead still
+  records `owner_evidence` (blank is fine), `source`, `source_url` and its score.
+- **Google Maps leads only (Neal, Nov 19).** No YellowPages, licence lists or manufacturer
+  locators. Tag every lead `source=google_maps` with its placeId. Fresh scraping is Apify
+  `compass~crawler-google-places` (~$0.004/place; server-side filters +$0.001 each; $200/cycle cap,
+  cycle Nov 20–Dec 19 — do NOT ask to raise it).
+- **Deck and hardscape scraping resumed by Neal Nov 25; mortgage/HVAC still paused.** Cheapest-first:
+  mine already-paid Apify datasets before any new run (Nov 25 mined 537 deck + 248 hardscape leads for $0).
+- **SCRAPING PAUSED (Neal, Nov 23)** — superseded for deck/hardscape by the line above. After the Nov 23
+  deck scrape, launch NO Apify runs until Neal says to resume. Apify cycle was ~$165 of $200 (98% our Google Maps actor). Leads are sized to
+  last to Nov 30: deck 75/day, W1-B hardscape 15/day, W2 mortgage 20/day. If deck runs short, lower
+  its daily cap rather than scrape. Next scrape needs a cheaper method (half of each search was
+  already-scraped places).
+- **The winning recipe (Nov 4–14, all positives). Restored Nov 21 — do not drift. No filter may
+  be added that did not exist then without Neal's say-so.**
+  - **Leads:** Google Maps "deck builder" + "deck contractor" in affluent counties. Rating ≥ 4.3,
+    20+ reviews (Claude's filter, Nov 19 — ~18% of the winning pool was below it; all positives
+    above), real site, no chain/supplier/franchise. **Do not require "deck" in the homepage
+    title, and do not restrict Apify to the "deck builder" category** — the winning deck pool was
+    only ~60% Google "Deck builder"; ~40% were general contractors, construction and fence
+    companies that build decks (positives G&J General Contractors, MAC Home Pros). Rule: category
+    "Deck builder" passes; other contractor categories pass if their own site mentions decks ≥2×;
+    drop painters, pressure washers, handymen, siding/roofing-first, stain/repair-only shops.
+  - **Email 1 is a MIX, not one email.** Deck Nov 4–14 positives per sends: "price shoppers"
+    2/281, "quick question" 1/35, "two homeowners" 1/17, "I'm just wondering" 1/~15. New deck
+    leads get 40% price shoppers + 20% each of the other three, word for word
+    (`scripts/pipeline/build_w.py`, variants J/Q/W/T; W uses the deck-project-planner tool).
+  - **Email 2:** "Bumping this up. Want me to send the deck designer over? It takes about a
+    minute to try." No link. The Nov 13 rewrite that put the link in Email 2 killed replies.
+  - **Email 3:** the breakup with the link.
+  - **Deck campaign 4336994:** 150 new leads/day (Neal, Nov 21), send window 8 AM–1 PM Central.
+- **Branding is ALWAYS on (Neal, Nov 23).** Every new tool_prospects row now queues a branding job
+  automatically (DB trigger `tool_prospects_always_enrich`), however it's inserted. Root cause of
+  the Nov 9–23 gap: our uploads inserted rows with raw SQL, which skipped the import API's job queue,
+  so ~2,700 pages had no logo/colors. Worker: cron `tool-branding-enrichment` every minute →
+  `/api/public/enrich`, now 20 per run. Never remove the trigger.
+- **Per-company offer + price range (Neal, Nov 23):** each tool must show that company's own services/
+  materials and a price range for that company — published prices from their site when they exist,
+  otherwise a local-market estimate labelled as such. Never present an estimate as their own prices.
+- **Campaign Guard (Nov 23):** n8n workflow `TaS4QljV4fLfDMd7` checks all 10 sending campaigns every
+  5 min and auto-restores status, schedule (cap/window/days) and inboxes from n8n data table
+  `fo_campaign_expected` (`RUfMOReEhaXEjPN2`), alerting #cold-email; alerts on lead drops/new campaigns.
+  **Before changing any cap/window/status, update that table first** or the guard reverts it. Built
+  after another team's agent (GrokBot/Angel via Cursor) proposed holding our queued leads.
+  Smartlead gateway `vLADM6PiJ14ItZsv` stays unpublished except while we use it.
+- **Inbox disconnect alarm (Nov 25).** Campaign Guard `TaS4QljV4fLfDMd7` (every 30 min) checks all 20 cold-email
+  inboxes for SMTP/IMAP failure, suspension, or warmup blocked/off; calls Smartlead
+  `POST /email-accounts/reconnect-failed-email-accounts`; DMs Raine Macaraeg (Brutus bot, U0C78GKR5NF; Neal, Nov 25) on a new problem, every 2h
+  while unresolved, and when fixed. Password changes caused the Nov 16–17 disconnects: never change a sending inbox's
+  password without reconnecting it the same day.
+- **Every emailed tool link must load (Nov 25).** DB trigger `tool_prospects_ensure_niche_tools` gives every
+  page its niche's full tool set on insert/update; never remove it. Before Nov 25, 30 W3 Hardscape planner links
+  and up to 42 early W3 Deck planner links showed "Tool not found" (incl. positive G&J). After any upload, test
+  every emailed tool type, not just one, and tell Neal immediately about anything a prospect may have hit.
+- **Inbox sender names are locked (Nov 25).** Re-signing an inbox into Smartlead with Google (e.g. after the
+  Nov 16 password change) copies the Google account's name into `from_name` — that is how Priya Iyer became
+  "Priya Shah", Ashley Park "Ashley Morgan", Roddy Hayes "Roddy Gulag", Mason Reed "Mason Johnson" and John Carter
+  "John Smith", so emails said one name and signed another. The Nov 4–14 names (proven from From headers in
+  prospect replies) were restored, and Inbox Limit Guard `t0sU6Afy2tjycbRc` now restores every inbox's name and
+  signature (`<div>Name</div><div>FlowOperations</div>`) 5x daily. carly@ stays "Marly Thakkar" (Neal's call). To
+  rename an inbox, edit the guard's NAMES list first. Renaming the Google Workspace users to match stops the drift at source.
+- **Mix follows positives.** Deck gets the biggest share of new leads; HVAC the smallest.
+- **Dedupe by company name and phone too**, not just email/domain — a different address at a
+  company we already emailed is still a repeat.
+- **Reoon keep rule:** safe + catch_all + role_account; drop unknown, invalid, disabled.
 - **Scan every lead after an upload**, never a sample. A 25-lead sample once passed while 1,275
   were broken.
 - **Model calls go in n8n HTTP nodes**, not Code nodes — 60s limit kills them silently.
 - **Check `campaign_lead_stats.notStarted` before judging performance.** A dry list looks
   identical to a paused campaign in reports.
+
+## Lead supply system (Nov 26) — scrape daily, never pay twice, warn early
+
+Goal (Neal, Nov 26): deck ≥ 100 new leads/day; hardscape ≥ 7 days runway at 20/day. Google Maps only; filters unchanged.
+
+- **Actor:** Apify `santamaria-automations~google-maps-scraper` ($1/1,000 places, no filter surcharge, same data
+  as compass — tested Nov 26). Run via `scripts/pipeline/lead_supply.py` (`budget`, `scrape <dir>`, `prep_retry <dir>`,
+  `screen <dir> <idx.json> <dnc.json>`). Apify calls go through this cloud environment's proxy credential; the n8n
+  Apify credentials are all dead (401), so scraping runs in a Claude session, not n8n.
+- **Never pay for a known place:** every run passes `excludeCids` = every CID we have ever scraped. Tested Nov 26:
+  excluded places are skipped and **not charged**; the actor returns deeper, unseen places instead. Registry =
+  Apify KV store `fo-lead-supply` (`Ca6Cu8iAJ7xQuGtFv`), record `registry.gz` (37,890 CIDs backfilled from all 215
+  past Maps datasets); `areas` = county queues (unsearched counties bordering ≥2 searched ones; picks steer to the
+  best usable-per-$ states); `unreadable` = sites that failed to load, retried weekly.
+- **Budget:** keep $2 buffer; spend up to 30% of what's left per day (front-loaded), never less than the even pace;
+  deck 85% / hardscape 15%. Cycle Nov 20 – Dec 19 23:59 UTC (resets Dec 20). Never ask to raise the $200 cap.
+- **Deck phrases:** "deck builder", "deck contractor", "deck company", "deck installer" (last two added Nov 26;
+  drop one if its usable-per-$ in `fo_searched_areas` is clearly worse). Hardscape: "hardscape contractor", "paver installer".
+- **Logs:** n8n tables `fo_searched_areas` (`F4mK2FUDjD5JT9zD`, yield per area and per phrase) and
+  `fo_lead_supply_daily` (`G3PFAg0N8V61rLAS`), via webhook `fo-supply-log-7q2k` (workflow `PCWEuLZwLlSr9ZhJ`).
+- **Forecast:** workflow `wH2P6UQDC3Mg4Dwp` (4:40 PM CT) posts queue runway, scrape rate and Apify $ left to
+  fo_ce_events → Evening report; a WARNING line when deck runway < 7 days or supply won't cover the cap to the reset.
+- **Areas:** first ring (unsearched counties bordering ≥2 searched), then second ring (≥1), then re-searches of the
+  best counties (exclusion makes Google return deeper, unseen places). Picks sized by observed cost per county.
+- **Reoon:** `lead_supply.py verify` via n8n webhook `EWA6SgxsdzJUjXa8` (publish only while verifying; credential
+  "Reoon API Key"). Uses only today's remaining DAILY credits minus 5 (never instant credits), oldest pending first,
+  deck best-first; writes `READY_GM_<DATE>_*.json` (safe + catch_all + role_account) for the standard upload.
+- **Daily run:** scheduled task `trig_01Aupstn56QqERvg1DFDoXVs` (5:23 AM CT, this session): scrape → dedupe → screen →
+  verify → tell Neal and ask for his go before uploading. One paid scrape per day (`areas.last_scrape` guard).
+- **Nov 26 first run:** $2.80 for 3,157 new places (0 known returned) → 114 deck + 79 hardscape usable
+  (~63 deck / ~79 hardscape usable per $). Usable per $ by deck phrase: builder 57, contractor 54, company 61, installer 52.
+- **Cross-niche deck screen (Nov 27):** `screen` also checks every hardscape place against the unchanged deck rule; a place
+  goes to one campaign only (deck wins), and "pool deck"/"deck removal" mentions don't count. One-off on already-paid places
+  (Nov 27): 2,900 hardscape + 90 fence/pool/roofing places → 28 new deck leads for $0 (mostly landscapers that build decks).
+- **Facebook email lookup:** off — facebook.com serves an error page to our fetcher (Nov 26).
+- **After the Apify budget runs out:** Google Places API free tier is the planned fallback (see Neal's notes; needs a
+  Google Cloud project + key from Neal). Until then: lower the deck cap rather than buy outside Google Maps.
 
 ## Where things live
 
